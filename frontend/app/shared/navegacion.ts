@@ -23,9 +23,13 @@ export const GRUPOS: { titulo: string; secciones: Seccion[] }[] = [
   {
     titulo: 'Clientes',
     secciones: [
-      { slug: 'alto-valor', menu: 'Más valiosos', pregunta: 'Segmentación de clientes y concentración del gasto anual', icono: 'i-lucide-gem', para: ['Marketing', 'Finanzas'] },
-      { slug: 'suscripcion', menu: 'Suscripciones', pregunta: 'Comparativa de desempeño entre clientes suscritos y no suscritos', icono: 'i-lucide-repeat', para: ['Finanzas', 'Marketing'] },
-      { slug: 'envios', menu: 'Preferencia de envío', pregunta: 'Distribución de modalidades de envío por segmento de cliente', icono: 'i-lucide-truck', para: ['Ventas', 'Finanzas'] },
+      {
+        slug: 'clientes',
+        menu: 'Valor, suscripción y envíos',
+        pregunta: 'Segmentación por valor anual, impacto de suscripción y preferencias de envío',
+        icono: 'i-lucide-users',
+        para: ['Marketing', 'Ventas', 'Finanzas'],
+      },
     ],
   },
   {

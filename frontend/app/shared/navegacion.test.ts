@@ -9,7 +9,7 @@ describe('navegación', () => {
   it('sin rol muestra todas', () => expect(seccionesPara()).toHaveLength(SECCIONES.length))
   it('filtra por rol y mantiene las de confianza', () => {
     const finanzas = seccionesPara('Finanzas').map((s) => s.slug)
-    expect(finanzas).toContain('suscripcion')
+    expect(finanzas).toContain('clientes')
     expect(finanzas).toContain('calidad')
     expect(finanzas).not.toContain('promocion')
   })
