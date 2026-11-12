@@ -45,8 +45,7 @@ Prueba técnica (Analista de Desarrollo e Integración). Pipeline ETL + API + da
 cp .env.example .env
 #    editar .env: POSTGRES_PASSWORD, JWT_SECRETO (>= 32 caracteres), ADMIN_USUARIO, ADMIN_CLAVE
 
-# 2. Dataset: descargar shopping_trends.csv de Kaggle y dejarlo en datos/
-ls datos/shopping_trends.csv
+# 2. Dataset: incluido en datos/shopping_trends.csv (fuente: Kaggle, Customer Shopping Trends)
 
 # 3. Levantar base de datos, backend y frontend
 docker compose up --build -d

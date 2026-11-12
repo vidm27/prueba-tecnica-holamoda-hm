@@ -6,7 +6,6 @@ __pycache__/
 node_modules/
 .nuxt/
 .output/
-datos/*.csv
 PLAN.md
 .claude/
 CLAUDE.md
