@@ -20,6 +20,13 @@ services:
     ports:
       - "8000:8000"
 
+  frontend:
+    build: ./frontend
+    depends_on:
+      - api
+    ports:
+      - "3001:80"
+
   etl:
     build: ./etl
     env_file: .env
