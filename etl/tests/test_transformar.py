@@ -29,6 +29,21 @@ def test_separa_tablas_y_normaliza():
     assert not t["compras"].descuento.iloc[0]
     assert list(t["clientes"].grupo_edad) == ["25-34", "65+"]
     assert set(t["compras"].producto_id) == set(t["productos"].id)
+    assert "auditoria" in t
+
+
+def test_segmentacion_por_valor():
+    frecs = ["Annually", "Quarterly", "Monthly", "Weekly"]
+    df = pd.DataFrame([fila(**{"Customer ID": i + 1, "Frequency of Purchases": f}) for i, f in enumerate(frecs)])
+    c = transformar(df)["clientes"].set_index("id")
+    assert list(c.compras_por_anio) == [1, 4, 12, 52]
+    assert c.gasto_anual_estimado[4] == 50 * 52
+    assert list(c.nivel_valor) == ["Bronce", "Plata", "Oro", "Platino"]
+
+
+def test_falla_con_frecuencia_desconocida():
+    with pytest.raises(ValueError):
+        transformar(pd.DataFrame([fila(**{"Frequency of Purchases": "Daily"})]))
 
 
 def test_descarta_duplicados_e_invalidos():

@@ -1,21 +1,23 @@
 import logging
 
 import pandas as pd
-from sqlalchemy import Engine, text
+from sqlalchemy import Engine
 from sqlmodel import Session, SQLModel
 
-from modelos import Cliente, Compra, Producto
+from modelos import Cliente, Compra, HallazgoAuditoria, Producto
 
 log = logging.getLogger(__name__)
-ORDEN = [("clientes", Cliente), ("productos", Producto), ("compras", Compra)]  # respeta FKs
+ORDEN = [("clientes", Cliente), ("productos", Producto), ("compras", Compra),
+         ("auditoria", HallazgoAuditoria)]  # respeta llaves foráneas
 
 
 def cargar(tablas: dict[str, pd.DataFrame], engine: Engine) -> None:
-    """Recarga completa e idempotente en una sola transacción:
-    si algo falla, la BD queda como estaba."""
-    SQLModel.metadata.create_all(engine)
+    """Recarga completa en una sola transacción (Postgres soporta DDL transaccional):
+    se recrea el esquema y se insertan los datos; si algo falla, la BD queda como estaba."""
     with Session(engine) as sesion:
-        sesion.execute(text("TRUNCATE compras, clientes, productos"))
+        conexion = sesion.connection()
+        SQLModel.metadata.drop_all(conexion)
+        SQLModel.metadata.create_all(conexion)
         for nombre, modelo in ORDEN:
             sesion.add_all(modelo(**r) for r in tablas[nombre].to_dict("records"))
             sesion.flush()
