@@ -1,6 +1,6 @@
 from statistics import median
 
-from sqlalchemy import case, desc, func, not_, select
+from sqlalchemy import case, desc, func, not_
 from sqlmodel import Session
 
 from app.nucleo.consultas import compras_con_detalle, filas, redondear

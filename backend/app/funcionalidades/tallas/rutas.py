@@ -1,15 +1,10 @@
 from fastapi import APIRouter, Depends
-from sqlmodel import Session
 
 from app.funcionalidades.tallas.esquemas import CurvaTalla
 from app.funcionalidades.tallas.servicio import TallasServicio
-from app.nucleo.db import obtener_sesion
+from app.funcionalidades.tallas.dependencias import obtener_servicio
 
 router = APIRouter(tags=["Tallas"])
-
-
-def obtener_servicio(sesion: Session = Depends(obtener_sesion)) -> TallasServicio:
-    return TallasServicio(sesion)
 
 
 @router.get("/tallas/curva", response_model=list[CurvaTalla], summary="Curva de tallas por categoría")

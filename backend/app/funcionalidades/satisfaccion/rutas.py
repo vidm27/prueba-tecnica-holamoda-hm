@@ -1,15 +1,10 @@
 from fastapi import APIRouter, Depends
-from sqlmodel import Session
 
 from app.funcionalidades.satisfaccion.esquemas import Satisfaccion
 from app.funcionalidades.satisfaccion.servicio import SatisfaccionServicio
-from app.nucleo.db import obtener_sesion
+from app.funcionalidades.satisfaccion.dependencias import obtener_servicio
 
 router = APIRouter(tags=["Satisfacción"])
-
-
-def obtener_servicio(sesion: Session = Depends(obtener_sesion)) -> SatisfaccionServicio:
-    return SatisfaccionServicio(sesion)
 
 
 @router.get("/productos/satisfaccion", response_model=list[Satisfaccion],

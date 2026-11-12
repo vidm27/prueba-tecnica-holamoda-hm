@@ -1,15 +1,10 @@
 from fastapi import APIRouter, Depends
-from sqlmodel import Session
 
 from app.funcionalidades.estacionalidad.esquemas import Estacionalidad
 from app.funcionalidades.estacionalidad.servicio import EstacionalidadServicio
-from app.nucleo.db import obtener_sesion
+from app.funcionalidades.estacionalidad.dependencias import obtener_servicio
 
 router = APIRouter(tags=["Estacionalidad"])
-
-
-def obtener_servicio(sesion: Session = Depends(obtener_sesion)) -> EstacionalidadServicio:
-    return EstacionalidadServicio(sesion)
 
 
 @router.get("/productos/estacionalidad", response_model=list[Estacionalidad],
