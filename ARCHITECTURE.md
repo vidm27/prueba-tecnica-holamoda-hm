@@ -347,6 +347,13 @@ flowchart TB
 - **Token:** vive en memoria y en `sessionStorage` (se borra al cerrar la pestaña).
 - **Caché:** TanStack Query con `staleTime` de 60 s, porque los datos solo cambian al correr el ETL.
 
+### Errores y sesión
+
+- **Cliente HTTP** (`shared/useApi.ts`): cada error se convierte en `ErrorApi`, con el código HTTP y el mensaje del backend. Un 401 cierra la sesión y lleva a `/login`.
+- **Mensajes para la persona** (`shared/errores.ts`, `mensajeAmigable`): traduce el código HTTP a un texto en español, sin detalles técnicos. El 422 conserva el mensaje del backend, porque ya dice qué filtro revisar. Las alertas de `SeccionRespuesta` y `TarjetasResumen` lo usan.
+- **Reintentos** (`plugins/vue-query.ts`): no reintenta los errores de cliente ni la falta de conexión (`estado` 0). Reintenta hasta 2 veces los 5xx.
+- **Login:** un 401 muestra "Usuario o clave incorrectos". Un 429 muestra el aviso de espera.
+
 ## 7. Endpoints
 
 Todos bajo `/api/v1`, con Bearer salvo `auth/login`.
@@ -383,10 +390,26 @@ Todos bajo `/api/v1`, con Bearer salvo `auth/login`.
 | Autenticación | JWT HS256 con usuario en `.env` | Un solo operador; sin tabla de usuarios |
 | Límite de login | 10 por minuto por IP | Frena fuerza bruta sin bloquear el uso normal |
 
-## 9. Limitaciones conocidas
+## 9. Pruebas y CI
+
+| Capa | Unitarias | Integración y E2E | En CI |
+|---|---|---|---|
+| ETL | `etl/tests`: transformaciones y auditoría | — | Sí (`test-etl`) |
+| Backend | `backend/tests/nucleo` (errores, logs, seguridad, limitador, contrato OpenAPI) y `test_unitarios_*` por funcionalidad | Integración contra Postgres en `backend/tests/funcionalidades` | Sí (`test-backend`) |
+| Frontend | Vitest: `app/**/*.test.ts` (formato, navegación, estadística, cuadrícula, errores) | Playwright: `frontend/tests/e2e` | Vitest sí; E2E no |
+
+La integración del backend corre contra la base real: el CI levanta Postgres con `docker compose`, carga el dataset con
+el ETL y luego corre `pytest` dentro del contenedor `api`. Sin datos, los tests de endpoints se omiten.
+
+## 10. Limitaciones conocidas
 
 - **Sin fechas de compra:** no hay tendencias en el tiempo ni retención.
 - **Límites en memoria:** el limitador de login guarda sus contadores por proceso. Con varias réplicas
   habría que usar Redis (`storage_uri`).
 - **Un solo usuario administrador.** Con más usuarios haría falta tabla de usuarios y hash de claves.
 - **Dataset sintético:** la auditoría lo señala; las conclusiones se presentan con esa salvedad.
+- **Frontend sin ESLint:** el paso de lint del frontend en CI no valida nada hasta agregar la configuración.
+- **E2E fuera de CI:** Playwright necesita backend y frontend levantados; se corre a mano con `pnpm test:e2e`.
+- **Token en `sessionStorage`:** es legible desde JavaScript. Una cookie `HttpOnly` lo evitaría (ver `docs/decisiones-entrega.md`).
+- **Sin medición formal de rendimiento:** no hay pruebas de carga ni tiempos de respuesta documentados.
+- **Recarga completa del ETL:** cada corrida reemplaza todas las tablas. Es suficiente para este volumen.
