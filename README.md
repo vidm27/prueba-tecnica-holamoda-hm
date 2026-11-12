@@ -17,9 +17,9 @@ Prueba técnica (Analista de Desarrollo e Integración). Pipeline ETL + API + da
 ├── backend/              Proyecto FastAPI
 │   ├── app/
 │   │   ├── main.py       Arranque: registra las funcionalidades
-│   │   ├── funcionalidades/   Una carpeta por pregunta de negocio (rutas + esquemas + SQL)
-│   │   └── nucleo/       Configuración, base de datos, seguridad y limitador
-│   ├── tests/            Pruebas espejo de app/ (funcionalidades/ y nucleo/)
+│   │   ├── funcionalidades/   Una carpeta por pregunta de negocio (rutas, servicio, esquemas)
+│   │   └── nucleo/       Configuración, modelos ORM, sesión, seguridad y limitador
+│   ├── tests/            Pruebas espejo de app/: de integración y unitarias
 │   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/             Proyecto Nuxt (SPA)
