@@ -15,7 +15,7 @@ export function useApi() {
       })
     } catch (e: any) {
       if (e?.status === 401) await salir()
-      throw new ErrorApi(e?.status ?? 0, e?.data?.detail ?? 'Error al consultar la API')
+      throw new ErrorApi(e?.status ?? 0, e?.data?.error?.mensaje ?? 'Error al consultar la API')
     }
   }
 }

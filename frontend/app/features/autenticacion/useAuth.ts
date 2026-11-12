@@ -15,7 +15,7 @@ export function useAuth() {
       sessionStorage.setItem(CLAVE, r.access_token)
     } catch (e: any) {
       const mensajes: Record<number, string> = { 401: 'Usuario o clave incorrectos' }
-      throw new Error(mensajes[e?.status] ?? (e?.status === 429 ? e.data?.detail : 'No se pudo conectar con la API'))
+      throw new Error(mensajes[e?.status] ?? (e?.status === 429 ? e.data?.error?.mensaje : 'No se pudo conectar con la API'))
     }
   }
 
