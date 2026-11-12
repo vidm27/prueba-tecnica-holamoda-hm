@@ -1,20 +1,17 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import Connection
+from sqlmodel import Session
 
 from app.funcionalidades.resumen.esquemas import Resumen
-from app.nucleo.db import filas, obtener_conexion
-from app.nucleo.sql import UNIONES
+from app.funcionalidades.resumen.servicio import ResumenServicio
+from app.nucleo.db import obtener_sesion
 
 router = APIRouter(tags=["Resumen"])
 
 
+def obtener_servicio(sesion: Session = Depends(obtener_sesion)) -> ResumenServicio:
+    return ResumenServicio(sesion)
+
+
 @router.get("/resumen", response_model=Resumen, summary="Indicadores generales")
-def resumen(con: Connection = Depends(obtener_conexion)):
-    return filas(con, f"""
-        SELECT count(*) AS compras,
-               (SELECT count(*) FROM clientes) AS clientes,
-               (SELECT count(*) FROM productos) AS productos,
-               round(sum(c.monto_usd)::numeric, 2) AS ingreso_total,
-               round(avg(c.monto_usd)::numeric, 2) AS ticket_promedio,
-               round(avg(c.calificacion)::numeric, 2) AS calificacion_promedio
-        {UNIONES}""")[0]
+def resumen(servicio: ResumenServicio = Depends(obtener_servicio)):
+    return servicio.obtener()

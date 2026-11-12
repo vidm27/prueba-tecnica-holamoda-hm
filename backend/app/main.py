@@ -3,9 +3,10 @@ import logging
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy import Connection, text
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy import literal, select
 from sqlalchemy.exc import SQLAlchemyError
+from sqlmodel import Session
 
 from app.funcionalidades.autenticacion import rutas as autenticacion
 from app.funcionalidades.calidad import rutas as calidad
@@ -21,7 +22,7 @@ from app.funcionalidades.suscripcion import rutas as suscripcion
 from app.funcionalidades.tallas import rutas as tallas
 from app.funcionalidades.valor_clientes import rutas as valor_clientes
 from app.nucleo.config import config
-from app.nucleo.db import obtener_conexion
+from app.nucleo.db import obtener_sesion
 from app.nucleo.limitador import limitador, respuesta_limite_excedido
 from app.nucleo.seguridad import usuario_actual
 
@@ -36,8 +37,6 @@ app = FastAPI(
 )
 app.add_middleware(CORSMiddleware, allow_origins=config.cors_origenes.split(","),
                    allow_methods=["GET", "POST"], allow_headers=["Authorization", "Content-Type"])
-
-
 app.state.limitador = limitador
 app.add_exception_handler(RateLimitExceeded, respuesta_limite_excedido)
 
@@ -49,12 +48,14 @@ async def error_bd(_: Request, exc: SQLAlchemyError):
 
 
 @app.get("/salud", tags=["Sistema"], summary="Estado del servicio")
-def salud(con: Connection = Depends(obtener_conexion)):
-    con.execute(text("SELECT 1"))
+def salud(sesion: Session = Depends(obtener_sesion)):
+    sesion.execute(select(literal(1)))
     return {"estado": "ok"}
 
 
-# Cada funcionalidad es una rebanada vertical: ruta + esquemas + SQL + tests en su carpeta.
+# Cada funcionalidad es una rebanada vertical: rutas (entrada HTTP), servicio (lógica y consultas),
+# esquemas (contrato) y tests. Las rutas reciben su servicio por inyección de dependencias.
 app.include_router(autenticacion.router, prefix="/api/v1")  # público: emite el token
-for rebanada in (calidad, compras, envios, estacionalidad, estados, hipotesis, promociones, resumen, satisfaccion, suscripcion, tallas, valor_clientes):
+for rebanada in (calidad, compras, envios, estacionalidad, estados, hipotesis,
+                 promociones, resumen, satisfaccion, suscripcion, tallas, valor_clientes):
     app.include_router(rebanada.router, prefix="/api/v1", dependencies=[Depends(usuario_actual)])

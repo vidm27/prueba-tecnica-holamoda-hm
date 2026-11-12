@@ -1,20 +1,18 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import Connection
+from sqlmodel import Session
 
 from app.funcionalidades.estacionalidad.esquemas import Estacionalidad
-from app.nucleo.db import filas, obtener_conexion
+from app.funcionalidades.estacionalidad.servicio import EstacionalidadServicio
+from app.nucleo.db import obtener_sesion
 
 router = APIRouter(tags=["Estacionalidad"])
 
 
+def obtener_servicio(sesion: Session = Depends(obtener_sesion)) -> EstacionalidadServicio:
+    return EstacionalidadServicio(sesion)
+
+
 @router.get("/productos/estacionalidad", response_model=list[Estacionalidad],
             summary="Temporada pico y valle de cada producto")
-def estacionalidad(con: Connection = Depends(obtener_conexion)):
-    por_producto: dict[str, dict[str, int]] = {}
-    for f in filas(con, """
-            SELECT p.nombre AS producto, c.temporada, count(*) AS ventas
-            FROM compras c JOIN productos p ON p.id = c.producto_id GROUP BY 1, 2"""):
-        por_producto.setdefault(f["producto"], {})[f["temporada"]] = f["ventas"]
-    return [{"producto": p, "ventas_por_temporada": v,
-             "temporada_pico": max(v, key=v.get), "temporada_valle": min(v, key=v.get)}
-            for p, v in sorted(por_producto.items())]
+def estacionalidad(servicio: EstacionalidadServicio = Depends(obtener_servicio)):
+    return servicio.por_producto()

@@ -1,10 +1,12 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import text
+from sqlalchemy import func, select
+from sqlmodel import Session
 
 from app.main import app
 from app.nucleo.config import config
 from app.nucleo.db import engine
+from app.nucleo.modelos import Compra
 from app.nucleo.limitador import limitador
 
 
@@ -25,8 +27,8 @@ def cliente():
 @pytest.fixture(scope="session")
 def hay_datos():
     """Los tests de endpoints son de integración: requieren haber corrido el ETL."""
-    with engine.connect() as con:
-        if not con.execute(text("SELECT count(*) FROM compras")).scalar():
+    with Session(engine) as sesion:
+        if not sesion.scalar(select(func.count(Compra.id))):
             pytest.skip("Base vacía: corre el ETL primero")
 
 
