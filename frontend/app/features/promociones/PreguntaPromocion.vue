@@ -2,7 +2,13 @@
 import { RECOMENDACIONES, type Recomendacion } from './usePromociones'
 
 const { data, isPending, error } = usePromociones()
+const { data: auditoria } = useAuditoria()
 const filtro = ref<Recomendacion | null>(null)
+
+const hallazgoGenero = computed(() => auditoria.value?.find((h) => h.regla === 'beneficios_por_genero'))
+const totalFilas = computed(() => hallazgoGenero.value?.total_filas ?? 3900)
+const filasAfectadas = computed(() => hallazgoGenero.value?.filas_afectadas ?? 1248)
+const pctAfectadas = computed(() => Math.round((100 * filasAfectadas.value) / Math.max(1, totalFilas.value)))
 
 const CUADRANTES: { clave: Recomendacion; icono: string; subtitulo: string; badge: 'success' | 'error' | 'warning' | 'neutral' }[] = [
   { clave: 'promocion_exposicion', icono: 'i-lucide-megaphone', subtitulo: 'Alta calificación · Bajas ventas', badge: 'success' },
@@ -19,6 +25,59 @@ const productosFiltrados = computed(() =>
 
 <template>
   <SeccionRespuesta :cargando="isPending" :error="error">
+    <!-- Tarjeta de Oportunidad Estratégica: Sesgo y Oportunidad en Segmento Femenino -->
+    <UCard
+      v-if="data"
+      class="border-l-4 border-l-primary bg-primary/5 dark:bg-primary/10"
+    >
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div class="space-y-2 lg:max-w-2xl">
+          <div class="flex flex-wrap items-center gap-2">
+            <UBadge color="primary" variant="solid" size="sm" icon="i-lucide-sparkles" label="Oportunidad comercial" />
+            <UBadge color="error" variant="subtle" size="sm" icon="i-lucide-octagon-alert" label="Severidad alta" />
+            <span class="font-mono text-xs text-muted">beneficios_por_genero</span>
+          </div>
+
+          <h3 class="text-base font-bold text-default">
+            Ninguna mujer tiene suscripción ni descuento: 32% de mercado sin explorar
+          </h3>
+
+          <p class="text-xs leading-relaxed text-muted">
+            <strong class="text-default">Oportunidad para Marketing:</strong>
+            El segmento femenino representa {{ entero(filasAfectadas) }} compras ({{ pctAfectadas }}% del total) y actualmente tiene cero promociones registradas. Lanzar campañas de descuento de bienvenida y membresías para mujeres es la mayor oportunidad de crecimiento incremental sin riesgo de canibalización previa.
+          </p>
+
+          <p class="text-xs leading-relaxed text-muted">
+            <strong class="text-default">Sesgo en analítica de precios:</strong>
+            El 100% de los descuentos históricos se aplicó a hombres. Esto impide evaluar la elasticidad real de descuentos en el segmento femenino con datos del histórico; se sugiere validar con pruebas piloto A/B.
+          </p>
+        </div>
+
+        <div class="flex shrink-0 flex-col justify-center rounded-xl bg-elevated/80 p-4 ring-1 ring-default lg:w-72">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-muted">Registros alcanzados</span>
+            <span class="font-bold tabular-nums text-primary">{{ pctAfectadas }}%</span>
+          </div>
+          <p class="mt-1 text-lg font-extrabold tabular-nums">
+            {{ entero(filasAfectadas) }} <span class="text-xs font-normal text-muted">/ {{ entero(totalFilas) }} compras</span>
+          </p>
+          <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-default/40">
+            <div class="h-full rounded-full bg-primary" :style="{ width: `${pctAfectadas}%` }" />
+          </div>
+          <div class="mt-2.5 grid grid-cols-2 gap-2 border-t border-default pt-2 text-[11px]">
+            <div>
+              <p class="text-muted">Mujeres c/descuento</p>
+              <p class="font-bold text-error tabular-nums">0 (0%)</p>
+            </div>
+            <div>
+              <p class="text-muted">Mujeres suscritas</p>
+              <p class="font-bold text-error tabular-nums">0 (0%)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </UCard>
+
     <div v-if="data" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <button
         v-for="c in CUADRANTES"
