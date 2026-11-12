@@ -3,11 +3,10 @@
 Pydantic valida cada fila; estas reglas detectan problemas que solo se ven
 mirando todas las filas juntas: redundancias, sesgos imposibles, ruido.
 """
-import logging
+from loguru import logger as log
 
 import pandas as pd
 
-log = logging.getLogger(__name__)
 
 MUESTRA_MINIMA = 100  # reglas estadísticas no se evalúan con menos filas
 SINONIMOS_FRECUENCIA = [("Quarterly", "Every 3 Months"), ("Bi-Weekly", "Fortnightly")]
@@ -111,8 +110,8 @@ def auditar(df: pd.DataFrame) -> pd.DataFrame:
             if h := regla(df):
                 hallazgos.append(h)
         except Exception:  # una regla defectuosa no debe tumbar la carga
-            log.exception("Regla de auditoría '%s' falló", regla.__name__)
+            log.exception("Regla de auditoría '{}' falló", regla.__name__)
     for h in hallazgos:
-        log.info("Auditoría [%s] %s: %d/%d filas", h["severidad"], h["regla"], h["filas_afectadas"], h["total_filas"])
+        log.info("Auditoría [{}] {}: {}/{} filas", h["severidad"], h["regla"], h["filas_afectadas"], h["total_filas"])
     return pd.DataFrame(hallazgos, columns=["regla", "descripcion", "severidad",
                                             "filas_afectadas", "total_filas", "evidencia"])
