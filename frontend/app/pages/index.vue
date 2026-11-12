@@ -23,9 +23,10 @@ const preguntas = computed(() => seccionesPara(rol.value))
           <UCard class="h-full transition group-hover:ring-2 group-hover:ring-primary">
             <div class="flex items-start gap-3">
               <UIcon :name="s.icono" class="mt-0.5 size-5 shrink-0 text-primary" />
-              <div class="space-y-2">
+              <div class="space-y-1.5">
+                <p class="text-xs font-semibold tracking-wide text-primary uppercase">{{ s.menu }}</p>
                 <p class="font-medium">{{ s.pregunta }}</p>
-                <div class="flex flex-wrap gap-1">
+                <div class="flex flex-wrap gap-1 pt-0.5">
                   <UBadge v-for="a in s.para.length ? s.para : ['Todos']" :key="a" :label="a" size="sm" color="neutral" variant="subtle" />
                 </div>
               </div>
