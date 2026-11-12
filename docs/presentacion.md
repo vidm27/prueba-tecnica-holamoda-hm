@@ -60,7 +60,31 @@ Kaggle CSV ──► ETL ──► PostgreSQL ◄── API FastAPI ◄── Fr
 
 ---
 
-## 5. El ETL
+## 5. Arquitectura por dentro
+
+Cada petición recorre las mismas capas, de afuera hacia adentro:
+
+```
+Petición ─► middleware ─► router central ─► ruta ─► dependencia ─► servicio ─► ORM ─► PostgreSQL
+            (request_id)  (JWT aplicado     (HTTP)  (construye     (decide,       (agrega,
+             y duración)   una vez)                  el servicio)   consulta)      filtra)
+                                                          │
+                                       error de aplicación ┘ ─► manejador único
+                                                                 {"error": {codigo, estatus, mensaje}}
+```
+
+- **Router central:** todas las rutas cuelgan de un solo punto protegido. Una ruta nueva queda protegida
+  por defecto, y una prueba falla si alguna queda abierta.
+- **Ruta:** solo traduce HTTP. **Servicio:** decide y consulta, sin saber nada de HTTP.
+- **Errores:** el servicio decide el estatus y el código. Un manejador los convierte en un formato único.
+- **Trazabilidad:** cada petición tiene un `request_id` en todos sus logs.
+
+> Nota: la estructura se lee de arriba abajo, como el recorrido de una petición. Quien revisa el código
+> encuentra cada paso en su carpeta por funcionalidad.
+
+---
+
+## 6. El ETL
 
 1. **Extraer** el CSV sin transformarlo.
 2. **Validar** cada fila con Pydantic: tipos, rangos y booleanos Yes/No.
@@ -73,7 +97,7 @@ Kaggle CSV ──► ETL ──► PostgreSQL ◄── API FastAPI ◄── Fr
 
 ---
 
-## 6. Hallazgos que cambian la conversación
+## 7. Hallazgos que cambian la conversación
 
 - **Platino** (25 % de los clientes) aporta **65 %** del gasto estimado.
 - El 20 % de clientes con más gasto aporta el **57 %**.
@@ -83,7 +107,7 @@ Kaggle CSV ──► ETL ──► PostgreSQL ◄── API FastAPI ◄── Fr
 
 ---
 
-## 7. Seguridad y calidad
+## 8. Seguridad y calidad
 
 - **Autenticación:** JWT firmado, usuario en `.env`, y una prueba que falla si una ruta queda sin token.
 - **Límite de login:** 10 intentos por minuto por IP, con `Retry-After`.
@@ -93,7 +117,7 @@ Kaggle CSV ──► ETL ──► PostgreSQL ◄── API FastAPI ◄── Fr
 
 ---
 
-## 8. Desafíos y cómo los resolví
+## 9. Desafíos y cómo los resolví
 
 | Desafío | Solución |
 |---|---|
@@ -112,7 +136,7 @@ Kaggle CSV ──► ETL ──► PostgreSQL ◄── API FastAPI ◄── Fr
 
 ---
 
-## 9. Demostración
+## 10. Demostración
 
 Guion en vivo, de unos 5 minutos:
 
@@ -133,7 +157,7 @@ Guion en vivo, de unos 5 minutos:
 
 ---
 
-## 10. Mejoras con más tiempo
+## 11. Mejoras con más tiempo
 
 1. **Cookie `HttpOnly`** para el token, en lugar de `sessionStorage`.
 2. **Redis** para el límite de login con varias réplicas.
@@ -144,7 +168,7 @@ Guion en vivo, de unos 5 minutos:
 
 ---
 
-## 11. Cierre
+## 12. Cierre
 
 - Construí un sistema que responde preguntas de negocio **y dice cuándo no debe responderlas**.
 - Lo más valioso fue el diagnóstico de los datos, no la cantidad de gráficos.
