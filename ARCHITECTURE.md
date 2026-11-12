@@ -46,6 +46,9 @@ flowchart TB
 
 ## 3. Pipeline ETL
 
+El ETL convierte el CSV de Kaggle en tres tablas relacionales y una tabla de hallazgos de calidad. Corre
+bajo demanda, como un contenedor de un solo uso: `docker compose run --rm etl`.
+
 ```mermaid
 flowchart LR
     A[extraer<br/>lee el CSV] --> B[validar<br/>Pydantic por fila]
@@ -58,11 +61,92 @@ flowchart LR
     F --> DB[(PostgreSQL)]
 ```
 
+### 3.1 Extracción
+
+`extraer.py` lee `datos/shopping_trends.csv` tal como viene, sin transformar nada. Espera 3,900 filas y
+19 columnas. Si la ruta no existe o el archivo no se puede leer, la ejecución falla con un error claro.
+
+### 3.2 Validación por fila
+
+`transformar.py` valida cada fila con el modelo `FilaCruda` de Pydantic (`esquemas.py`). Ese modelo define
+los 19 campos con su alias en inglés, el tipo, el rango y la obligatoriedad:
+
+| Campo | Regla |
+|---|---|
+| `Customer ID` | entero ≥ 1 |
+| `Age` | entero entre 0 y 120 |
+| `Purchase Amount (USD)` | número mayor que 0 |
+| `Review Rating` | número entre 1 y 5 |
+| `Previous Purchases` | entero ≥ 0 |
+| `Subscription Status`, `Discount Applied`, `Promo Code Used` | booleanos (Yes/No) |
+| Texto (género, producto, categoría, color, talla, etc.) | no vacío, sin espacios sobrantes |
+
+Las filas que no cumplen una regla se descartan y se registran en el log con su número de línea. Las filas
+duplicadas por `Customer ID` también se eliminan. Con los datos actuales, ninguna fila se rechaza.
+
+### 3.3 Enriquecimiento
+
+`enriquecer` agrega las columnas que el análisis necesita:
+
+- **`grupo_edad`:** tramos de edad (≤24, 25-34, 35-44, 45-54, 55-64, 65+).
+- **`compras_por_anio`:** la frecuencia declarada se convierte en número de compras al año. Semanal son 52;
+  quincenal y cada dos semanas, 26; mensual, 12; trimestral, 4; anual, 1. Una frecuencia desconocida detiene
+  la carga, para no inventar valores.
+- **`gasto_anual_estimado`:** monto por compras al año.
+- **`nivel_valor`:** cuartiles del gasto anual, calculados por percentil. Bronce, Plata, Oro y Platino.
+
+### 3.4 Separación
+
+`separar` convierte el conjunto plano en tres tablas:
+
+- **`productos`:** combinaciones únicas de nombre y categoría, con un id nuevo.
+- **`clientes`:** un registro por cliente con sus datos demográficos y de valor.
+- **`compras`:** una compra por cliente, con su producto, monto, talla, color, temporada, calificación y envío.
+  El dataset trae una compra por cliente, así que el id de la compra coincide con el del cliente.
+
+### 3.5 Auditoría de calidad
+
+`auditar.py` revisa el conjunto completo, algo que la validación por fila no puede ver. Ejecuta ocho reglas
+y guarda cada hallazgo en la tabla `auditoria`, con su severidad y su evidencia:
+
+| Regla | Qué detecta | Severidad |
+|---|---|---|
+| `beneficios_por_genero` | Un género sin suscripción ni descuento | alta |
+| `columnas_redundantes` | Dos columnas idénticas | media |
+| `suscripcion_implica_descuento` | Dependencia entre suscripción y descuento | media |
+| `pago_preferido_aleatorio` | Método de pago preferido que coincide con el azar | media |
+| `frecuencia_sin_relacion_historial` | Frecuencia declarada sin relación con el historial (Spearman) | media |
+| `distribuciones_uniformes` | Distribuciones casi perfectamente uniformes, indicio de datos sintéticos | info |
+| `frecuencias_sinonimas` | Categorías con el mismo significado | info |
+| `sin_dimension_temporal` | El dataset no trae fecha de compra | info |
+
+Las reglas estadísticas exigen al menos 100 filas. Si una regla falla, se registra y la carga continúa: un
+error en la auditoría no debe impedir cargar los datos.
+
+### 3.6 Carga
+
+`cargar.py` recrea el esquema con los modelos de SQLModel y luego inserta las tablas en orden de dependencia
+(clientes, productos, compras y auditoría). Todo ocurre dentro de una sola transacción.
+
 Propiedades del ETL:
-- **Idempotente:** cada corrida recrea el esquema y carga todo de nuevo; repetirla da el mismo resultado.
-- **Atómico:** Postgres tiene DDL transaccional, así que si algo falla la base queda como estaba.
-- **Tolerante a reglas defectuosas:** si una regla de auditoría falla, se registra y la carga continúa.
-- **Sin dependencias pesadas:** la correlación de Spearman se calcula con pandas (sin scipy).
+- **Idempotente:** cada corrida borra y recrea el esquema, así que repetirla da el mismo resultado.
+- **Atómico:** Postgres tiene DDL transaccional. Si algo falla a mitad de la carga, la base queda como estaba.
+- **Verificable:** al terminar, el log indica cuántas filas se cargaron por tabla. Con los datos actuales son
+  3,900 clientes, 25 productos, 3,900 compras y 8 hallazgos.
+- **Sin dependencias pesadas:** la correlación de Spearman se calcula con pandas, sin scipy.
+
+### 3.7 Errores y cómo verificarlo
+
+Si la ejecución falla, `main.py` registra el error completo y termina con código 1. Para verificar una carga:
+
+```bash
+docker compose up -d db
+docker compose run --rm etl            # carga y muestra conteos
+docker compose run --rm --no-deps etl pytest -q   # 8 pruebas del ETL
+```
+
+Las pruebas cubren la separación de tablas, el descarte de filas inválidas, la segmentación por valor, las
+reglas de auditoría y el error ante una frecuencia desconocida.
 
 ## 4. Modelo de datos
 
