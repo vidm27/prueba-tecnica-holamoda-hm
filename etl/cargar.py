@@ -1,4 +1,4 @@
-import logging
+from loguru import logger as log
 
 import pandas as pd
 from sqlalchemy import Engine
@@ -6,7 +6,6 @@ from sqlmodel import Session, SQLModel
 
 from modelos import Cliente, Compra, HallazgoAuditoria, Producto
 
-log = logging.getLogger(__name__)
 ORDEN = [("clientes", Cliente), ("productos", Producto), ("compras", Compra),
          ("auditoria", HallazgoAuditoria)]  # respeta llaves foráneas
 
@@ -21,5 +20,5 @@ def cargar(tablas: dict[str, pd.DataFrame], engine: Engine) -> None:
         for nombre, modelo in ORDEN:
             sesion.add_all(modelo(**r) for r in tablas[nombre].to_dict("records"))
             sesion.flush()
-            log.info("Cargada %s: %d filas", nombre, len(tablas[nombre]))
+            log.info("Cargada {}: {} filas", nombre, len(tablas[nombre]))
         sesion.commit()
