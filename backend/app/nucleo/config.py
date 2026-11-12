@@ -15,7 +15,7 @@ class Configuracion(BaseSettings):
     admin_clave: str
     cors_origenes: str = "http://localhost:3000"
     log_nivel: str = "INFO"  # DEBUG para ver el detalle de cada petición
-    login_limite: str = "5/5 minutes"  # formato de slowapi: "<n>/<n> <unidad>"
+    login_limite: str = "10/minute"  # formato de slowapi: "<n>/<unidad>", p. ej. "10/minute"
 
     @property
     def url_bd(self) -> str:
