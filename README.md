@@ -45,7 +45,7 @@ Prueba técnica (Analista de Desarrollo e Integración). Pipeline ETL + API + da
 cp .env.example .env
 #    editar .env: POSTGRES_PASSWORD, JWT_SECRETO (>= 32 caracteres), ADMIN_USUARIO, ADMIN_CLAVE
 
-# 2. Dataset: incluido en datos/shopping_trends.csv (fuente: Kaggle, Customer Shopping Trends)
+# 2. Dataset: incluido en datos/shopping_trends.csv (ver "Fuente de datos" abajo)
 
 # 3. Levantar base de datos, backend y frontend
 docker compose up --build -d
@@ -121,3 +121,12 @@ docker compose down -v            # parar y borrar la base
 - `NUXT_PUBLIC_API_BASE` se incorpora al **compilar** el frontend, porque lo usa el navegador. Si cambia, ejecuta `docker compose build frontend`.
 - CORS acepta los orígenes de `CORS_ORIGENES`.
 - El login tiene límite de intentos por IP (`LOGIN_LIMITE`, por defecto 5 cada 5 minutos). Al superarlo responde 429 con `Retry-After`.
+
+## Fuente de datos
+
+- **Dataset:** *Customer Shopping Trends Dataset*, publicado en Kaggle:
+  https://www.kaggle.com/datasets/iamsouravbanerjee/customer-shopping-trends-dataset
+- **Autor y licencia:** pendientes de confirmar. La página del dataset no muestra el autor ni la licencia en la
+  versión consultada, así que hay que revisarlas antes de hacer público el repositorio.
+- **Uso en el proyecto:** el archivo se versiona en `datos/shopping_trends.csv` para que el ETL funcione sin
+  pasos adicionales. Si la licencia lo exige, se puede dejar de versionar y documentar la descarga.
