@@ -1,6 +1,6 @@
 """Formato único de error de la API: {"error": {"codigo", "mensaje", "detalle"?}}."""
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class DetalleError(BaseModel):
@@ -16,6 +16,9 @@ class Error(BaseModel):
 
 
 class ErrorRespuesta(BaseModel):
+    model_config = ConfigDict(json_schema_extra={"example": {'error': {'codigo': 'datos_insuficientes',
+                   'estatus': 422,
+                   'mensaje': 'No hay variación suficiente para comparar los grupos'}}})
     error: Error
 
 

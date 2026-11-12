@@ -16,4 +16,8 @@ router = APIRouter(responses=ERRORES, prefix="/auth", tags=["Autenticación"])
 @limitador.limit(config.login_limite)  # slowapi exige el parámetro `request`
 def login(request: Request, formulario: OAuth2PasswordRequestForm = Depends(),
           servicio: AutenticacionServicio = Depends(obtener_servicio)):
+    """Valida usuario y clave y devuelve un token JWT.
+
+    Usa el token en el botón **Authorize** o en la cabecera `Authorization: Bearer <token>`.
+    Límite: 10 intentos por minuto por IP; al superarlo responde `429` con `Retry-After`."""
     return servicio.iniciar_sesion(formulario.username, formulario.password)

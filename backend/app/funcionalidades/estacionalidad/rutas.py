@@ -11,4 +11,5 @@ router = APIRouter(responses=ERRORES, tags=["Estacionalidad"])
 @router.get("/productos/estacionalidad", response_model=list[Estacionalidad],
             summary="Temporada pico y valle de cada producto")
 def estacionalidad(servicio: EstacionalidadServicio = Depends(obtener_servicio)):
+    """Ventas de cada producto por temporada, con la temporada de mayor venta (pico) y la de menor (valle)."""
     return servicio.por_producto()
