@@ -38,7 +38,7 @@ Ocho preguntas de negocio, respondidas con los datos de compra en segundos, cada
 Es lo que nos diferencia. Otros dashboards muestran gráficos; este **revisa primero la calidad de los datos**
 y separa lo que sí se puede concluir de lo que no.
 
-- **Detecta sesgos antes de decidir.** En el ejemplo, ninguna cliente mujer tuvo acceso a suscripción ni
+- **Detecta sesgos antes de decidir.** En el ejemplo, ninguna mujer de la base tuvo acceso a suscripción ni
   descuento. Un análisis sin esta revisión habría concluido algo equivocado.
 - **Corrige por azar.** Cuando se prueban muchas combinaciones, algunas parecen significativas por casualidad.
   La herramienta lo corrige: en el ejemplo, una diferencia de monto por temporada pasa de p = 0.0098 a
@@ -102,7 +102,7 @@ Datos ──► ETL ──► PostgreSQL ◄── API (FastAPI) ◄── Dashb
 
 ## Calidad y operación
 
-- **48 pruebas automáticas:** 8 del ETL, 40 del backend y 18 del frontend.
+- **66 pruebas automáticas:** 8 del ETL, 40 del backend y 18 del frontend.
 - **Integración continua:** lint de Ruff y pruebas de cada parte en cada cambio.
 - **Logs con trazabilidad:** cada petición tiene un identificador y su duración.
 - **Documentación técnica:** arquitectura, decisiones con su justificación y guía de operación.
