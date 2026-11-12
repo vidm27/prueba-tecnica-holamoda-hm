@@ -12,10 +12,34 @@ const COMPONENTES: Record<string, Component> = {
 }
 
 const slug = String(useRoute().params.seccion)
+const esContrasteProductos = slug === 'promocion' || slug === 'satisfaccion'
 const componente = COMPONENTES[slug]
 if (!componente) throw createError({ statusCode: 404, statusMessage: 'Página no encontrada', fatal: true })
 </script>
 
 <template>
-  <component :is="componente" />
+  <div v-if="esContrasteProductos" class="mx-auto max-w-5xl space-y-12">
+    <section class="space-y-4">
+      <div class="flex items-center gap-2.5 border-b border-default pb-3">
+        <UIcon name="i-lucide-megaphone" class="size-5 text-primary" />
+        <div>
+          <h2 class="text-base font-semibold">Oportunidades de promoción</h2>
+          <p class="text-xs text-muted">Productos con buena calificación pero bajas ventas que necesitan mayor visibilidad</p>
+        </div>
+      </div>
+      <PreguntaPromocion />
+    </section>
+
+    <section class="space-y-4">
+      <div class="flex items-center gap-2.5 border-b border-default pb-3">
+        <UIcon name="i-lucide-thumbs-down" class="size-5 text-error" />
+        <div>
+          <h2 class="text-base font-semibold">Productos que gustan menos</h2>
+          <p class="text-xs text-muted">Contraste de satisfacción promedio y margen de error para distinguir problemas reales del azar</p>
+        </div>
+      </div>
+      <PreguntaSatisfaccion />
+    </section>
+  </div>
+  <component :is="componente" v-else />
 </template>
