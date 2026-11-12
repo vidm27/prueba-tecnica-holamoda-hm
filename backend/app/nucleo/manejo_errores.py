@@ -1,16 +1,13 @@
 """Convierte cualquier error en la respuesta estándar. Es el único lugar que decide el formato."""
-import logging
-
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from slowapi.errors import RateLimitExceeded
+from loguru import logger
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as ErrorHTTP
 
 from app.nucleo.errores import ErrorAplicacion, LimiteExcedido, ServicioNoDisponible
 from app.nucleo.respuestas import respuesta_error
-
-log = logging.getLogger("api")
 
 CODIGOS_HTTP = {400: "solicitud_invalida", 401: "no_autorizado", 403: "prohibido",
                 404: "no_encontrado", 405: "metodo_no_permitido"}
@@ -18,6 +15,7 @@ MENSAJES_HTTP = {404: "La ruta solicitada no existe", 405: "Método no permitido
 
 
 def _desde_aplicacion(error: ErrorAplicacion):
+    logger.warning("{} ({}): {}", error.codigo, error.estatus, error.mensaje)
     return respuesta_error(error.estatus, error.codigo, error.mensaje,
                            detalle=error.detalle, cabeceras=error.cabeceras)
 
@@ -45,10 +43,10 @@ def registrar_manejadores(app: FastAPI) -> None:
 
     @app.exception_handler(SQLAlchemyError)
     async def error_bd(_: Request, exc: SQLAlchemyError):
-        log.exception("Error de base de datos")
+        logger.exception("Error de base de datos")
         return _desde_aplicacion(ServicioNoDisponible())
 
     @app.exception_handler(Exception)
     async def error_inesperado(_: Request, exc: Exception):
-        log.exception("Error no controlado")
+        logger.exception("Error no controlado")
         return respuesta_error(500, "error_interno", "Error interno del servidor")
