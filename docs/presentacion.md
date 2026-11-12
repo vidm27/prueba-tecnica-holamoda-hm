@@ -89,7 +89,7 @@ Kaggle CSV ──► ETL ──► PostgreSQL ◄── API FastAPI ◄── Fr
 - **Límite de login:** 10 intentos por minuto por IP, con `Retry-After`.
 - **Errores:** un solo formato, con código estable y estatus HTTP.
 - **Logs:** loguru con `request_id` por petición.
-- **Tests:** 8 del ETL, 40 del backend y 18 del frontend; ruff y ESLint en CI.
+- **Tests:** 8 del ETL, 40 del backend y 18 del frontend. Ruff en CI; el frontend todavía no tiene linter.
 
 ---
 
