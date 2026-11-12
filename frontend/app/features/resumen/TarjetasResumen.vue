@@ -16,11 +16,13 @@ const kpis = computed(() => resumen.value && [
       <USkeleton v-for="n in 4" :key="n" class="h-24" />
     </template>
     <UCard v-for="k in kpis" v-else :key="k.titulo">
-      <div class="flex items-center gap-3">
-        <UIcon :name="k.icono" class="size-6 text-primary" />
+      <div class="flex items-center gap-3.5">
+        <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <UIcon :name="k.icono" class="size-5" />
+        </div>
         <div>
-          <p class="text-sm text-muted">{{ k.titulo }}</p>
-          <p class="text-2xl font-semibold">{{ k.valor }}</p>
+          <p class="text-xs font-medium tracking-wide text-muted uppercase">{{ k.titulo }}</p>
+          <p class="mt-0.5 text-2xl font-bold tabular-nums">{{ k.valor }}</p>
           <p class="text-xs text-muted">{{ k.detalle }}</p>
         </div>
       </div>

@@ -18,33 +18,55 @@ const series = computed(() => tipos.value.map((t) => ({
 })))
 const parejo = computed(() => 100 / Math.max(1, tipos.value.length))
 const maximo = computed(() => Math.max(0, ...(data.value ?? []).map((d) => d.pct_segmento)))
-/** Un líder cuenta si supera el reparto parejo por al menos 5 puntos. */
-const hayPreferencia = computed(() => maximo.value - parejo.value >= 5)
 </script>
 
 <template>
   <SeccionRespuesta :cargando="isPending && !data" :error="error">
-    <template #respuesta>
-      <template v-if="!hayPreferencia">
-        Ningún segmento tiene un envío preferido: cada uno de los {{ tipos.length }} tipos se usa en ~{{ Math.round(parejo) }}% de las compras.
-      </template>
-      <template v-else>Hay segmentos con un envío claramente preferido: revisa el gráfico.</template>
-    </template>
-    <template #accion>
-      No conviene diseñar ofertas de envío por segmento con estos datos. Si se quiere reducir costo, se puede probar quitar opciones caras sin esperar rechazo de un grupo específico.
-    </template>
+    <div class="grid gap-4 sm:grid-cols-3">
+      <UCard>
+        <p class="text-xs font-medium tracking-wide text-muted uppercase">Modalidades de envío</p>
+        <p class="mt-2 text-2xl font-bold tabular-nums">{{ tipos.length }}</p>
+        <p class="text-xs text-muted">Opciones activas en tienda</p>
+      </UCard>
+      <UCard>
+        <p class="text-xs font-medium tracking-wide text-muted uppercase">Reparto uniforme esperado</p>
+        <p class="mt-2 text-2xl font-bold tabular-nums">{{ parejo.toFixed(1) }}%</p>
+        <p class="text-xs text-muted">Si la elección es equiprobable (1/{{ tipos.length }})</p>
+      </UCard>
+      <UCard>
+        <p class="text-xs font-medium tracking-wide text-muted uppercase">Participación máxima</p>
+        <div class="mt-2 flex items-baseline gap-2">
+          <p class="text-2xl font-bold tabular-nums">{{ maximo.toFixed(1) }}%</p>
+          <UBadge color="neutral" variant="subtle" size="sm" :label="`+${(maximo - parejo).toFixed(1)} pts vs. uniforme`" />
+        </div>
+        <p class="text-xs text-muted">Mayor concentración en un segmento</p>
+      </UCard>
+    </div>
 
     <UCard>
-      <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <p class="text-sm text-muted">Reparto de los tipos de envío dentro de cada segmento (cada barra suma 100%).</p>
-        <USelect v-model="segmento" :items="OPCIONES" class="w-48" />
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-medium">Distribución de tipos de envío por segmento</p>
+          <p class="text-xs text-muted">Proporción de cada modalidad dentro del segmento seleccionado (suma 100%)</p>
+        </div>
+        <div class="flex items-center gap-1.5 rounded-lg border border-default p-1">
+          <UButton
+            v-for="op in OPCIONES"
+            :key="op.value"
+            size="xs"
+            color="neutral"
+            :variant="segmento === op.value ? 'solid' : 'ghost'"
+            :label="op.label"
+            @click="segmento = op.value"
+          />
+        </div>
       </div>
       <GraficoBarras :etiquetas="segmentos.map(es)" :series="series" horizontal apilado sufijo="%" :maximo="100"
-                     :alto="Math.max(220, segmentos.length * 48 + 80)" />
+                     :alto="Math.max(240, segmentos.length * 48 + 80)" />
     </UCard>
 
     <template #confianza>
-      <p>Si los clientes eligieran al azar, cada tipo tendría {{ Math.round(parejo) }}%. El tipo más usado en cualquier segmento llega a {{ maximo.toFixed(1) }}%: una diferencia que entra en el azar.</p>
+      <p>Bajo una distribución uniforme entre {{ tipos.length }} modalidades, cada opción concentraría el {{ parejo.toFixed(1) }}% de los envíos; el máximo observado es {{ maximo.toFixed(1) }}%.</p>
     </template>
 
     <template #detalle>
@@ -55,7 +77,7 @@ const hayPreferencia = computed(() => maximo.value - parejo.value >= 5)
         <tbody>
           <tr v-for="(s, i) in segmentos" :key="s" class="border-t border-default">
             <td class="py-2 font-medium">{{ es(s) }}</td>
-            <td v-for="(serie, j) in series" :key="j" class="text-right">{{ serie.datos[i] }}%</td>
+            <td v-for="(serie, j) in series" :key="j" class="text-right tabular-nums">{{ serie.datos[i] }}%</td>
           </tr>
         </tbody>
       </table>

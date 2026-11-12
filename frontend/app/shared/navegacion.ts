@@ -12,33 +12,33 @@ export const GRUPOS: { titulo: string; secciones: Seccion[] }[] = [
       {
         slug: 'promocion',
         menu: 'Promoción y satisfacción',
-        pregunta: '¿Qué productos promocionar y cuáles gustan menos?',
+        pregunta: 'Posicionamiento de catálogo, oportunidades de visibilidad y nivel de satisfacción',
         icono: 'i-lucide-megaphone',
         para: ['Marketing', 'Ventas'],
       },
-      { slug: 'tallas', menu: 'Curva de tallas', pregunta: '¿Qué curva de tallas comprar por categoría?', icono: 'i-lucide-ruler', para: ['Ventas'] },
-      { slug: 'abastecimiento', menu: 'Abastecimiento', pregunta: '¿Cuándo abastecer cada producto?', icono: 'i-lucide-calendar-range', para: ['Ventas', 'Finanzas'] },
+      { slug: 'tallas', menu: 'Curva de tallas', pregunta: 'Distribución de tallas vendidas por categoría de producto', icono: 'i-lucide-ruler', para: ['Ventas'] },
+      { slug: 'abastecimiento', menu: 'Abastecimiento', pregunta: 'Comportamiento de demanda y estacionalidad por producto', icono: 'i-lucide-calendar-range', para: ['Ventas', 'Finanzas'] },
     ],
   },
   {
     titulo: 'Clientes',
     secciones: [
-      { slug: 'alto-valor', menu: 'Más valiosos', pregunta: '¿Quién es el cliente de alto valor?', icono: 'i-lucide-gem', para: ['Marketing', 'Finanzas'] },
-      { slug: 'suscripcion', menu: 'Suscripciones', pregunta: '¿Vale la pena la suscripción?', icono: 'i-lucide-repeat', para: ['Finanzas', 'Marketing'] },
-      { slug: 'envios', menu: 'Preferencia de envío', pregunta: '¿Qué tipo de envío prefiere cada segmento?', icono: 'i-lucide-truck', para: ['Ventas', 'Finanzas'] },
+      { slug: 'alto-valor', menu: 'Más valiosos', pregunta: 'Segmentación de clientes y concentración del gasto anual', icono: 'i-lucide-gem', para: ['Marketing', 'Finanzas'] },
+      { slug: 'suscripcion', menu: 'Suscripciones', pregunta: 'Comparativa de desempeño entre clientes suscritos y no suscritos', icono: 'i-lucide-repeat', para: ['Finanzas', 'Marketing'] },
+      { slug: 'envios', menu: 'Preferencia de envío', pregunta: 'Distribución de modalidades de envío por segmento de cliente', icono: 'i-lucide-truck', para: ['Ventas', 'Finanzas'] },
     ],
   },
   {
     titulo: 'Territorio',
     secciones: [
-      { slug: 'estados', menu: 'Ventas por estado', pregunta: '¿Qué producto se mueve más por estado, en qué talla y color?', icono: 'i-lucide-map', para: ['Ventas', 'Marketing'] },
+      { slug: 'estados', menu: 'Ventas por estado', pregunta: 'Mapa de demanda geográfica, tallas y colores por estado', icono: 'i-lucide-map', para: ['Ventas', 'Marketing'] },
     ],
   },
   {
     titulo: 'Confianza',
     secciones: [
-      { slug: 'calidad', menu: 'Calidad de datos', pregunta: '¿Qué tan confiables son los datos?', icono: 'i-lucide-shield-check', para: [] },
-      { slug: 'hipotesis', menu: 'Prueba de hipótesis', pregunta: '¿Esta diferencia es real o es azar?', icono: 'i-lucide-flask-conical', para: [] },
+      { slug: 'calidad', menu: 'Calidad de datos', pregunta: 'Auditoría estructural y estadística del conjunto de datos', icono: 'i-lucide-shield-check', para: [] },
+      { slug: 'hipotesis', menu: 'Prueba de hipótesis', pregunta: 'Laboratorio estadístico con corrección por comparaciones múltiples', icono: 'i-lucide-flask-conical', para: [] },
     ],
   },
 ]
