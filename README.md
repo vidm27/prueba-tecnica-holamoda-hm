@@ -28,7 +28,7 @@ Prueba técnica (Analista de Desarrollo e Integración). Pipeline ETL + API + da
 │       ├── shared/       Cliente de la API y utilidades comunes
 │       └── pages/, layouts/, plugins/, middleware/   Convenciones de Nuxt
 ├── etl/                  Carga del CSV a PostgreSQL (extraer, validar, transformar, cargar)
-├── datos/                Dataset (shopping_trends.csv, no versionado)
+├── datos/                Dataset de origen (shopping_trends.csv)
 ├── docs/                 Notas técnicas
 └── docker-compose.yml    db + backend + frontend + etl
 ```
