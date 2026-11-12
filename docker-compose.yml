@@ -12,7 +12,7 @@ services:
       retries: 10
 
   api:
-    build: ./api
+    build: ./backend/api
     env_file: .env
     depends_on:
       db:
