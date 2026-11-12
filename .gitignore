@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+node_modules/
+.nuxt/
+.output/
+datos/*.csv
+PLAN.md
+.claude/
+CLAUDE.md
+graphify-out/
+*.docx
+.DS_Store
