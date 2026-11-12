@@ -8,6 +8,7 @@ def assert_error(r, estado: int, codigo: str):
     assert set(cuerpo) == {"error"}
     assert cuerpo["error"]["codigo"] == codigo
     assert cuerpo["error"]["mensaje"]
+    assert cuerpo["error"]["estatus"] == estado
 
 
 def test_ruta_inexistente(cliente):
@@ -36,4 +37,4 @@ def test_errores_de_aplicacion_declaran_estado_y_codigo():
                  if isinstance(c, type) and issubclass(c, ErrorAplicacion) and c is not ErrorAplicacion]
     assert subclases
     for c in subclases:
-        assert c.estado >= 400 and c.codigo and c.codigo == c.codigo.lower()
+        assert c.estatus >= 400 and c.codigo and c.codigo == c.codigo.lower()

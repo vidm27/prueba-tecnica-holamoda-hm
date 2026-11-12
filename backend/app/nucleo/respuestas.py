@@ -10,6 +10,7 @@ class DetalleError(BaseModel):
 
 class Error(BaseModel):
     codigo: str
+    estatus: int
     mensaje: str
     detalle: list[DetalleError] | None = None
 
@@ -18,11 +19,11 @@ class ErrorRespuesta(BaseModel):
     error: Error
 
 
-def respuesta_error(estado: int, codigo: str, mensaje: str, *, detalle: list[dict] | None = None,
+def respuesta_error(estatus: int, codigo: str, mensaje: str, *, detalle: list[dict] | None = None,
                     cabeceras: dict[str, str] | None = None) -> JSONResponse:
-    cuerpo = {"error": {"codigo": codigo, "mensaje": mensaje, "detalle": detalle}}
-    cuerpo["error"] = {k: v for k, v in cuerpo["error"].items() if v is not None}
-    return JSONResponse(status_code=estado, content=cuerpo, headers=cabeceras)
+    error = {"codigo": codigo, "estatus": estatus, "mensaje": mensaje, "detalle": detalle}
+    cuerpo = {"error": {k: v for k, v in error.items() if v is not None}}
+    return JSONResponse(status_code=estatus, content=cuerpo, headers=cabeceras)
 
 
 # Respuestas de error que cada ruta documenta en OpenAPI. Todas las rutas las comparten.
