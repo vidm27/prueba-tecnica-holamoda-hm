@@ -3,16 +3,17 @@ from fastapi.testclient import TestClient
 from sqlalchemy import text
 
 from app.main import app
-from app.nucleo import limitador
 from app.nucleo.config import config
 from app.nucleo.db import engine
+from app.nucleo.limitador import limitador
 
 
 @pytest.fixture(autouse=True)
 def limitador_limpio():
-    """Cada test parte sin intentos fallidos acumulados."""
-    limitador.por_ip.reiniciar()
-    limitador.por_usuario.reiniciar()
+    """Cada test parte (y termina) sin intentos acumulados, para no afectar a la fixture `auth`."""
+    limitador.reset()
+    yield
+    limitador.reset()
 
 
 @pytest.fixture(scope="session")

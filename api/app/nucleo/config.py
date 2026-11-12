@@ -14,9 +14,7 @@ class Configuracion(BaseSettings):
     admin_usuario: str
     admin_clave: str
     cors_origenes: str = "http://localhost:3000"
-    login_max_fallos_ip: int = 5
-    login_max_fallos_usuario: int = 20
-    login_ventana_seg: int = 300
+    login_limite: str = "5/5 minutes"  # formato de slowapi: "<n>/<n> <unidad>"
 
     @property
     def url_bd(self) -> str:
