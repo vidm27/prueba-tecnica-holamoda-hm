@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends
 from app.funcionalidades.tallas.esquemas import CurvaTalla
 from app.funcionalidades.tallas.servicio import TallasServicio
 from app.funcionalidades.tallas.dependencias import obtener_servicio
+from app.nucleo.respuestas import ERRORES
 
-router = APIRouter(tags=["Tallas"])
+router = APIRouter(responses=ERRORES, tags=["Tallas"])
 
 
 @router.get("/tallas/curva", response_model=list[CurvaTalla], summary="Curva de tallas por categoría")

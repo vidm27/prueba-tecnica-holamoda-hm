@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends
 from app.funcionalidades.satisfaccion.esquemas import Satisfaccion
 from app.funcionalidades.satisfaccion.servicio import SatisfaccionServicio
 from app.funcionalidades.satisfaccion.dependencias import obtener_servicio
+from app.nucleo.respuestas import ERRORES
 
-router = APIRouter(tags=["Satisfacción"])
+router = APIRouter(responses=ERRORES, tags=["Satisfacción"])
 
 
 @router.get("/productos/satisfaccion", response_model=list[Satisfaccion],

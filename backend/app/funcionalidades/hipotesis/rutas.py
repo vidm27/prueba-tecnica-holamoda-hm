@@ -1,12 +1,13 @@
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from app.funcionalidades.hipotesis.esquemas import ResultadoHipotesis
-from app.funcionalidades.hipotesis.servicio import DatosInsuficientes, HipotesisServicio
+from app.funcionalidades.hipotesis.servicio import HipotesisServicio
 from app.funcionalidades.hipotesis.dependencias import obtener_servicio
+from app.nucleo.respuestas import ERRORES
 
-router = APIRouter(tags=["Hipótesis"])
+router = APIRouter(responses=ERRORES, tags=["Hipótesis"])
 
 Metrica = Literal["monto_usd", "calificacion"]
 Variable = Literal["genero", "suscrito", "grupo_edad", "estado", "nivel_valor", "frecuencia", "categoria",
@@ -17,7 +18,4 @@ Variable = Literal["genero", "suscrito", "grupo_edad", "estado", "nivel_valor", 
             summary="¿Cambia la métrica según la variable? (Kruskal-Wallis con corrección)")
 def probar_hipotesis(metrica: Metrica, variable: Variable,
                      servicio: HipotesisServicio = Depends(obtener_servicio)):
-    try:
-        return servicio.probar(metrica, variable)
-    except DatosInsuficientes:
-        raise HTTPException(422, "No hay variación suficiente para comparar los grupos")
+    return servicio.probar(metrica, variable)

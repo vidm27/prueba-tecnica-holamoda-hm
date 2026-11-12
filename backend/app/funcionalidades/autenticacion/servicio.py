@@ -1,10 +1,7 @@
 from app.funcionalidades.autenticacion.esquemas import Token
 from app.nucleo.config import config
+from app.nucleo.errores import CredencialesInvalidas
 from app.nucleo.seguridad import credenciales_validas, crear_token
-
-
-class CredencialesInvalidas(Exception):
-    """El usuario o la clave no coinciden."""
 
 
 class AutenticacionServicio:

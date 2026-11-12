@@ -4,6 +4,7 @@ from scipy.stats import kruskal
 from sqlmodel import Session
 
 from app.nucleo.consultas import compras_con_detalle
+from app.nucleo.errores import DatosInsuficientes
 from app.nucleo.modelos import Cliente, Compra, Producto
 
 # Listas blancas: las columnas salen de aquí, nunca de texto libre del usuario.
@@ -17,10 +18,6 @@ VARIABLES = {
 }
 # Número de pruebas posibles: base de la corrección de Bonferroni.
 PRUEBAS_POSIBLES = len(METRICAS) * len(VARIABLES)
-
-
-class DatosInsuficientes(Exception):
-    """No hay variación suficiente para comparar los grupos."""
 
 
 def _etiqueta(valor) -> str:
@@ -46,7 +43,7 @@ class HipotesisServicio:
         try:
             estadistico, p = kruskal(*[valores for _, valores in ordenados])
         except ValueError as e:
-            raise DatosInsuficientes from e
+            raise DatosInsuficientes("No hay variación suficiente para comparar los grupos") from e
         ajustado = min(1.0, float(p) * PRUEBAS_POSIBLES)
 
         if ajustado < 0.05:

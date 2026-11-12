@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends
 from app.funcionalidades.promociones.esquemas import Promociones
 from app.funcionalidades.promociones.servicio import PromocionesServicio
 from app.funcionalidades.promociones.dependencias import obtener_servicio
+from app.nucleo.respuestas import ERRORES
 
-router = APIRouter(tags=["Promociones"])
+router = APIRouter(responses=ERRORES, tags=["Promociones"])
 
 
 @router.get("/productos/promocion", response_model=Promociones,
