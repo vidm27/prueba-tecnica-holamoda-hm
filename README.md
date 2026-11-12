@@ -64,7 +64,19 @@ Después del paso 4 la base tiene 3,900 clientes, 25 productos y 3,900 compras.
 | Swagger / OpenAPI | http://localhost:8000/docs |
 | Salud del backend | http://localhost:8000/salud |
 
-Para entrar al dashboard usa `ADMIN_USUARIO` y `ADMIN_CLAVE` de tu `.env`.
+## Usuario para entrar
+
+Usa el usuario y la clave que defines en tu `.env`:
+
+| Campo | Variable en `.env` | Valor de ejemplo en `.env.example` |
+|---|---|---|
+| Usuario | `ADMIN_USUARIO` | `admin` |
+| Clave | `ADMIN_CLAVE` | `cambiar_esto_tambien` |
+
+Cambia la clave antes de levantar el proyecto: el valor de `.env.example` es solo un marcador. Si ya levantaste los
+contenedores con otra clave, reinicia el backend (`docker compose up -d api`) para que tome el cambio.
+
+El login acepta 10 intentos por minuto por IP (`LOGIN_LIMITE`). Si te bloquea, espera un minuto.
 
 En Swagger: `POST /api/v1/auth/login` → copiar el `access_token` → botón **Authorize**.
 
@@ -120,7 +132,7 @@ docker compose down -v            # parar y borrar la base
 
 - `NUXT_PUBLIC_API_BASE` se incorpora al **compilar** el frontend, porque lo usa el navegador. Si cambia, ejecuta `docker compose build frontend`.
 - CORS acepta los orígenes de `CORS_ORIGENES`.
-- El login tiene límite de intentos por IP (`LOGIN_LIMITE`, por defecto 5 cada 5 minutos). Al superarlo responde 429 con `Retry-After`.
+- El login tiene límite de intentos por IP (`LOGIN_LIMITE`, por defecto `10/minute`). Al superarlo responde 429 con `Retry-After`; el dashboard muestra un aviso en español.
 
 ## Fuente de datos
 

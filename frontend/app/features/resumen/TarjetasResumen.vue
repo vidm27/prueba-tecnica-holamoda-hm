@@ -10,7 +10,7 @@ const kpis = computed(() => resumen.value && [
 </script>
 
 <template>
-  <UAlert v-if="error" color="error" variant="subtle" :description="error.message" />
+  <UAlert v-if="error" color="error" variant="subtle" :description="mensajeAmigable(error instanceof ErrorApi ? error.estado : 0, error.message)" />
   <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <template v-if="isPending">
       <USkeleton v-for="n in 4" :key="n" class="h-24" />
