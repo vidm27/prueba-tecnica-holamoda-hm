@@ -11,5 +11,14 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: { apiBase: 'http://localhost:8000' }, // NUXT_PUBLIC_API_BASE
   },
-  app: { head: { title: 'Tendencias de compra · Hola Moda' } },
+  app: {
+    head: {
+      title: 'Tendencias de compra · Hola Moda',
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+      ],
+    },
+  },
 })
