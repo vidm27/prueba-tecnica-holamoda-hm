@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.funcionalidades.autenticacion.esquemas import Token
-from app.funcionalidades.autenticacion.servicio import AutenticacionServicio, CredencialesInvalidas
+from app.funcionalidades.autenticacion.servicio import AutenticacionServicio
 from app.funcionalidades.autenticacion.dependencias import obtener_servicio
 from app.nucleo.config import config
 from app.nucleo.limitador import limitador
+from app.nucleo.respuestas import ERRORES
 
-router = APIRouter(prefix="/auth", tags=["Autenticación"])
+router = APIRouter(responses=ERRORES, prefix="/auth", tags=["Autenticación"])
 
 
 @router.post("/login", response_model=Token, summary="Obtener un token JWT",
@@ -15,8 +16,4 @@ router = APIRouter(prefix="/auth", tags=["Autenticación"])
 @limitador.limit(config.login_limite)  # slowapi exige el parámetro `request`
 def login(request: Request, formulario: OAuth2PasswordRequestForm = Depends(),
           servicio: AutenticacionServicio = Depends(obtener_servicio)):
-    try:
-        return servicio.iniciar_sesion(formulario.username, formulario.password)
-    except CredencialesInvalidas:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Usuario o clave incorrectos",
-                            headers={"WWW-Authenticate": "Bearer"})
+    return servicio.iniciar_sesion(formulario.username, formulario.password)

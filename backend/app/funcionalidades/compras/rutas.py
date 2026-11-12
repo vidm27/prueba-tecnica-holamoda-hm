@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends, Query
 from app.funcionalidades.compras.esquemas import PaginaCompras
 from app.funcionalidades.compras.servicio import ComprasServicio
 from app.funcionalidades.compras.dependencias import obtener_servicio
+from app.nucleo.respuestas import ERRORES
 
-router = APIRouter(tags=["Compras"])
+router = APIRouter(responses=ERRORES, tags=["Compras"])
 
 
 @router.get("/compras", response_model=PaginaCompras, summary="Listado paginado de compras con filtros")

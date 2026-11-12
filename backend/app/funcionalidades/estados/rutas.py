@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends, Query
 from app.funcionalidades.estados.esquemas import TopEstado
 from app.funcionalidades.estados.servicio import EstadosServicio
 from app.funcionalidades.estados.dependencias import obtener_servicio
+from app.nucleo.respuestas import ERRORES
 
-router = APIRouter(tags=["Estados"])
+router = APIRouter(responses=ERRORES, tags=["Estados"])
 
 
 @router.get("/estados/top-productos", response_model=list[TopEstado],
