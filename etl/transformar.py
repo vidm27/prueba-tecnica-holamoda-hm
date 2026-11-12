@@ -1,4 +1,4 @@
-import logging
+from loguru import logger as log
 
 import pandas as pd
 from pydantic import ValidationError
@@ -6,7 +6,6 @@ from pydantic import ValidationError
 from auditar import auditar
 from esquemas import FilaCruda
 
-log = logging.getLogger(__name__)
 
 # "Bi-Weekly" se interpreta como cada dos semanas (igual que "Fortnightly").
 COMPRAS_POR_ANIO = {"Weekly": 52, "Bi-Weekly": 26, "Fortnightly": 26, "Monthly": 12,
@@ -32,13 +31,13 @@ def validar(crudo: pd.DataFrame) -> pd.DataFrame:
             validas.append(FilaCruda.model_validate(fila).model_dump())
         except ValidationError as e:
             rechazadas += 1
-            log.warning("Fila %d rechazada: %s", i + 2, e.errors()[0]["loc"])  # +2: cabecera y base 1
+            log.warning("Fila {} rechazada: {}", i + 2, e.errors()[0]["loc"])  # +2: cabecera y base 1
     df = pd.DataFrame(validas, columns=list(FilaCruda.model_fields))
     antes = len(df)
     df = df.drop_duplicates("cliente_id")
     if antes != len(df):
-        log.warning("Duplicados por cliente_id eliminados: %d", antes - len(df))
-    log.info("Validación: %d válidas, %d rechazadas", len(df), rechazadas)
+        log.warning("Duplicados por cliente_id eliminados: {}", antes - len(df))
+    log.info("Validación: {} válidas, {} rechazadas", len(df), rechazadas)
     return df
 
 
@@ -79,5 +78,5 @@ def transformar(crudo: pd.DataFrame) -> dict[str, pd.DataFrame]:
     df = enriquecer(validar(crudo))
     tablas = separar(df)
     tablas["auditoria"] = auditar(df)
-    log.info("Transformado: %s", {k: len(v) for k, v in tablas.items()})
+    log.info("Transformado: {}", {k: len(v) for k, v in tablas.items()})
     return tablas
