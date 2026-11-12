@@ -1,10 +1,15 @@
-<!-- Dispersión ventas × calificación con las medianas como cuadrantes. -->
+<!-- Dispersión ventas × calificación con las medianas como cuadrantes y etiquetas clicables para filtrar. -->
 <script setup lang="ts">
 import { Scatter } from 'vue-chartjs'
 import type { ChartOptions } from 'chart.js'
 import { RECOMENDACIONES, type Promociones, type Recomendacion } from './usePromociones'
 
 const props = defineProps<{ datos: Promociones; filtro?: Recomendacion | null }>()
+const emit = defineEmits<{ (e: 'filtrar', r: Recomendacion | null): void }>()
+
+const alternar = (r: Recomendacion) => {
+  emit('filtrar', props.filtro === r ? null : r)
+}
 
 const ORDEN_CUADRANTES: Recomendacion[] = ['promocion_exposicion', 'riesgo_reputacion', 'revisar_producto', 'mantener']
 
@@ -86,17 +91,53 @@ const opciones: ChartOptions<'scatter'> = {
 <template>
   <div class="relative h-96">
     <Scatter :data="datos" :options="opciones" />
-    <span class="pointer-events-none absolute top-2 left-14 rounded-md border border-success/30 bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
+    <button
+      type="button"
+      class="absolute top-2 left-14 cursor-pointer rounded-md border px-2.5 py-1 text-xs font-medium transition select-none"
+      :class="
+        filtro === 'promocion_exposicion'
+          ? 'border-success bg-success text-white shadow-sm ring-2 ring-success/40'
+          : 'border-success/30 bg-success/10 text-success hover:bg-success/20'
+      "
+      @click="alternar('promocion_exposicion')"
+    >
       ↖ Alta calificación · Bajas ventas (Promover)
-    </span>
-    <span class="pointer-events-none absolute top-2 right-3 hidden rounded-md border border-default bg-elevated/80 px-2.5 py-1 text-xs text-muted sm:inline-block">
+    </button>
+    <button
+      type="button"
+      class="absolute top-2 right-3 hidden cursor-pointer rounded-md border px-2.5 py-1 text-xs font-medium transition select-none sm:inline-block"
+      :class="
+        filtro === 'mantener'
+          ? 'border-primary bg-primary text-white shadow-sm ring-2 ring-primary/40'
+          : 'border-default bg-elevated/90 text-muted hover:bg-elevated hover:text-default'
+      "
+      @click="alternar('mantener')"
+    >
       ↗ Alta calificación · Altas ventas (Mantener)
-    </span>
-    <span class="pointer-events-none absolute bottom-12 left-14 hidden rounded-md border border-warning/30 bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning sm:inline-block">
+    </button>
+    <button
+      type="button"
+      class="absolute bottom-12 left-14 hidden cursor-pointer rounded-md border px-2.5 py-1 text-xs font-medium transition select-none sm:inline-block"
+      :class="
+        filtro === 'revisar_producto'
+          ? 'border-warning bg-warning text-white shadow-sm ring-2 ring-warning/40'
+          : 'border-warning/30 bg-warning/10 text-warning hover:bg-warning/20'
+      "
+      @click="alternar('revisar_producto')"
+    >
       ↙ Baja calificación · Bajas ventas (Revisar)
-    </span>
-    <span class="pointer-events-none absolute right-3 bottom-12 hidden rounded-md border border-error/30 bg-error/10 px-2.5 py-1 text-xs font-medium text-error sm:inline-block">
+    </button>
+    <button
+      type="button"
+      class="absolute right-3 bottom-12 hidden cursor-pointer rounded-md border px-2.5 py-1 text-xs font-medium transition select-none sm:inline-block"
+      :class="
+        filtro === 'riesgo_reputacion'
+          ? 'border-error bg-error text-white shadow-sm ring-2 ring-error/40'
+          : 'border-error/30 bg-error/10 text-error hover:bg-error/20'
+      "
+      @click="alternar('riesgo_reputacion')"
+    >
       ↘ Baja calificación · Altas ventas (Cuidar)
-    </span>
+    </button>
   </div>
 </template>

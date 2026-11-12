@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { RECOMENDACIONES, type Recomendacion } from './usePromociones'
+import { RECOMENDACIONES, type GeneroPromocion, type Recomendacion } from './usePromociones'
 
-const { data, isPending, error } = usePromociones()
-const { data: auditoria } = useAuditoria()
+const genero = ref<GeneroPromocion>('Todos')
+const { data, isPending, error } = usePromociones(genero)
 const filtro = ref<Recomendacion | null>(null)
 
-const hallazgoGenero = computed(() => auditoria.value?.find((h) => h.regla === 'beneficios_por_genero'))
-const totalFilas = computed(() => hallazgoGenero.value?.total_filas ?? 3900)
-const filasAfectadas = computed(() => hallazgoGenero.value?.filas_afectadas ?? 1248)
-const pctAfectadas = computed(() => Math.round((100 * filasAfectadas.value) / Math.max(1, totalFilas.value)))
+const GENEROS: { valor: GeneroPromocion; label: string; icono: string; nota: string }[] = [
+  { valor: 'Todos', label: 'Todos los clientes', icono: 'i-lucide-users', nota: 'Catálogo general (3,900 compras)' },
+  { valor: 'Female', label: 'Mujeres', icono: 'i-lucide-sparkles', nota: '0% con descuento hoy · Oportunidad virgen' },
+  { valor: 'Male', label: 'Hombres', icono: 'i-lucide-user', nota: 'Concentran el 100% de descuentos actuales' },
+]
 
 const CUADRANTES: { clave: Recomendacion; icono: string; subtitulo: string; badge: 'success' | 'error' | 'warning' | 'neutral' }[] = [
   { clave: 'promocion_exposicion', icono: 'i-lucide-megaphone', subtitulo: 'Alta calificación · Bajas ventas', badge: 'success' },
@@ -24,60 +25,39 @@ const productosFiltrados = computed(() =>
 </script>
 
 <template>
-  <SeccionRespuesta :cargando="isPending" :error="error">
-    <!-- Tarjeta de Oportunidad Estratégica: Sesgo y Oportunidad en Segmento Femenino -->
-    <UCard
-      v-if="data"
-      class="border-l-4 border-l-primary bg-primary/5 dark:bg-primary/10"
-    >
-      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div class="space-y-2 lg:max-w-2xl">
-          <div class="flex flex-wrap items-center gap-2">
-            <UBadge color="primary" variant="solid" size="sm" icon="i-lucide-sparkles" label="Oportunidad comercial" />
-            <UBadge color="error" variant="subtle" size="sm" icon="i-lucide-octagon-alert" label="Severidad alta" />
-            <span class="font-mono text-xs text-muted">beneficios_por_genero</span>
-          </div>
-
-          <h3 class="text-base font-bold text-default">
-            Ninguna mujer tiene suscripción ni descuento: 32% de mercado sin explorar
-          </h3>
-
-          <p class="text-xs leading-relaxed text-muted">
-            <strong class="text-default">Oportunidad para Marketing:</strong>
-            El segmento femenino representa {{ entero(filasAfectadas) }} compras ({{ pctAfectadas }}% del total) y actualmente tiene cero promociones registradas. Lanzar campañas de descuento de bienvenida y membresías para mujeres es la mayor oportunidad de crecimiento incremental sin riesgo de canibalización previa.
-          </p>
-
-          <p class="text-xs leading-relaxed text-muted">
-            <strong class="text-default">Sesgo en analítica de precios:</strong>
-            El 100% de los descuentos históricos se aplicó a hombres. Esto impide evaluar la elasticidad real de descuentos en el segmento femenino con datos del histórico; se sugiere validar con pruebas piloto A/B.
-          </p>
+  <SeccionRespuesta :cargando="isPending && !data" :error="error">
+    <!-- Barra de filtro por género: qué productos tienen oportunidad de promoción según el público -->
+    <div v-if="data" class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-default bg-elevated/40 p-3">
+      <div class="flex items-center gap-2.5">
+        <div class="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <UIcon name="i-lucide-venus-and-mars" class="size-4" />
         </div>
-
-        <div class="flex shrink-0 flex-col justify-center rounded-xl bg-elevated/80 p-4 ring-1 ring-default lg:w-72">
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-muted">Registros alcanzados</span>
-            <span class="font-bold tabular-nums text-primary">{{ pctAfectadas }}%</span>
-          </div>
-          <p class="mt-1 text-lg font-extrabold tabular-nums">
-            {{ entero(filasAfectadas) }} <span class="text-xs font-normal text-muted">/ {{ entero(totalFilas) }} compras</span>
+        <div>
+          <p class="text-xs font-semibold">Oportunidades de promoción y posicionamiento por género</p>
+          <p class="text-[11px] text-muted">
+            {{ GENEROS.find((g) => g.valor === genero)?.nota }}
+            <span v-if="genero === 'Female'" class="font-medium text-primary">
+              — Ideal para lanzar primeras campañas de visibilidad y descuento
+            </span>
           </p>
-          <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-default/40">
-            <div class="h-full rounded-full bg-primary" :style="{ width: `${pctAfectadas}%` }" />
-          </div>
-          <div class="mt-2.5 grid grid-cols-2 gap-2 border-t border-default pt-2 text-[11px]">
-            <div>
-              <p class="text-muted">Mujeres c/descuento</p>
-              <p class="font-bold text-error tabular-nums">0 (0%)</p>
-            </div>
-            <div>
-              <p class="text-muted">Mujeres suscritas</p>
-              <p class="font-bold text-error tabular-nums">0 (0%)</p>
-            </div>
-          </div>
         </div>
       </div>
-    </UCard>
 
+      <div class="flex flex-wrap items-center gap-1.5">
+        <UButton
+          v-for="g in GENEROS"
+          :key="g.valor"
+          size="xs"
+          :color="genero === g.valor ? 'primary' : 'neutral'"
+          :variant="genero === g.valor ? 'solid' : 'soft'"
+          :icon="g.icono"
+          :label="g.label"
+          @click="genero = g.valor"
+        />
+      </div>
+    </div>
+
+    <!-- Tarjetas de cuadrantes (clicables como filtros) -->
     <div v-if="data" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <button
         v-for="c in CUADRANTES"
@@ -115,23 +95,47 @@ const productosFiltrados = computed(() =>
       </button>
     </div>
 
+    <!-- Matriz con tags interactivos dentro del gráfico y en la cabecera -->
     <UCard v-if="data">
       <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p class="text-sm font-medium">Matriz de posicionamiento: Ventas vs. Calificación</p>
+          <p class="text-sm font-medium">
+            Matriz de posicionamiento: Ventas vs. Calificación
+            <span v-if="genero !== 'Todos'" class="text-primary">({{ genero === 'Female' ? 'Mujeres' : 'Hombres' }})</span>
+          </p>
           <p class="text-xs text-muted">
-            Corte por medianas ({{ data.mediana_ventas }} unidades vendidas · {{ data.mediana_calificacion.toFixed(2) }} ★). Haz clic en una tarjeta superior para filtrar cuadrantes.
+            Corte por medianas ({{ data.mediana_ventas }} unidades vendidas · {{ data.mediana_calificacion.toFixed(2) }} ★). Haz clic en las etiquetas dentro del gráfico o arriba para filtrar.
           </p>
         </div>
-        <UButton v-if="filtro" size="xs" color="neutral" variant="soft" icon="i-lucide-x" label="Ver todos los cuadrantes" @click="filtro = null" />
+
+        <div class="flex flex-wrap items-center gap-1.5">
+          <UBadge
+            v-if="genero === 'Female'"
+            color="primary"
+            variant="subtle"
+            size="sm"
+            icon="i-lucide-tag"
+            label="0% descuentos previos en mujeres"
+          />
+          <UButton
+            v-if="filtro || genero !== 'Todos'"
+            size="xs"
+            color="neutral"
+            variant="soft"
+            icon="i-lucide-rotate-ccw"
+            label="Restablecer filtros"
+            @click="filtro = null; genero = 'Todos'"
+          />
+        </div>
       </div>
-      <MapaPromocion :datos="data" :filtro="filtro" />
+
+      <MapaPromocion :datos="data" :filtro="filtro" @filtrar="filtro = $event" />
     </UCard>
 
     <template #confianza>
-      <p>Las calificaciones entre productos varían en décimas (±0.1): la matriz permite segmentar prioridades de exposición comercial y revisión de catálogo.</p>
+      <p>Las calificaciones entre productos varían en décimas (±0.1): la matriz permite segmentar prioridades de exposición comercial y revisión de catálogo por género.</p>
       <p>{{ data?.advertencia }}</p>
-      <p>Compras de mujeres con descuento registrado en el dataset: {{ data?.compras_mujeres_con_descuento }}.</p>
+      <p>Compras de mujeres con descuento registrado en el dataset: {{ data?.compras_mujeres_con_descuento }} (el 100% de los descuentos históricos se concentró en hombres).</p>
     </template>
 
     <template #detalle>
@@ -142,6 +146,8 @@ const productosFiltrados = computed(() =>
             <th>Categoría</th>
             <th class="text-right">Vendidos</th>
             <th class="text-right">Calificación</th>
+            <th class="text-right">% Mujeres</th>
+            <th class="text-right">% con desc.</th>
             <th class="pl-4">Cuadrante</th>
           </tr>
         </thead>
@@ -151,6 +157,8 @@ const productosFiltrados = computed(() =>
             <td>{{ es(p.categoria) }}</td>
             <td class="text-right tabular-nums">{{ p.ventas }}</td>
             <td class="text-right tabular-nums">{{ p.calificacion.toFixed(2) }} ★</td>
+            <td class="text-right tabular-nums">{{ fraccion(p.pct_mujeres, 0) }}</td>
+            <td class="text-right tabular-nums">{{ fraccion(p.pct_descuento, 0) }}</td>
             <td class="pl-4">
               <span class="mr-2 inline-block size-2.5 rounded-full" :style="{ background: RECOMENDACIONES[p.recomendacion].color }" />
               <span class="font-medium">{{ RECOMENDACIONES[p.recomendacion].texto }}</span>

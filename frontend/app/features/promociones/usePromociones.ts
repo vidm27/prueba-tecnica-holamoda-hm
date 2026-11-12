@@ -31,7 +31,16 @@ export interface Promociones {
   productos: ProductoPromocion[]
 }
 
-export function usePromociones() {
+export type GeneroPromocion = 'Todos' | 'Female' | 'Male'
+
+export function usePromociones(genero?: Ref<GeneroPromocion>) {
   const api = useApi()
-  return useQuery({ queryKey: ['promociones'], queryFn: () => api<Promociones>('/productos/promocion') })
+  return useQuery({
+    queryKey: ['promociones', genero ?? 'Todos'],
+    queryFn: () => {
+      const g = genero?.value
+      const query = g && g !== 'Todos' ? `?genero=${g}` : ''
+      return api<Promociones>(`/productos/promocion${query}`)
+    },
+  })
 }
