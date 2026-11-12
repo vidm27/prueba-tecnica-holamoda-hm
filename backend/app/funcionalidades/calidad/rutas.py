@@ -11,4 +11,5 @@ router = APIRouter(responses=ERRORES, tags=["Calidad de datos"])
 @router.get("/calidad/auditoria", response_model=list[Hallazgo],
             summary="Hallazgos de calidad detectados por el ETL")
 def auditoria(servicio: CalidadServicio = Depends(obtener_servicio)):
+    """Hallazgos de calidad que detectó el ETL, de mayor a menor severidad. Explican qué conclusiones deben tomarse con cautela."""
     return servicio.hallazgos()
