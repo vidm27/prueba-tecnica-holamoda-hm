@@ -5,24 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import literal, select
 from sqlmodel import Session
 
-from app.funcionalidades.autenticacion import rutas as autenticacion
-from app.funcionalidades.calidad import rutas as calidad
-from app.funcionalidades.compras import rutas as compras
-from app.funcionalidades.envios import rutas as envios
-from app.funcionalidades.estacionalidad import rutas as estacionalidad
-from app.funcionalidades.estados import rutas as estados
-from app.funcionalidades.hipotesis import rutas as hipotesis
-from app.funcionalidades.promociones import rutas as promociones
-from app.funcionalidades.resumen import rutas as resumen
-from app.funcionalidades.satisfaccion import rutas as satisfaccion
-from app.funcionalidades.suscripcion import rutas as suscripcion
-from app.funcionalidades.tallas import rutas as tallas
-from app.funcionalidades.valor_clientes import rutas as valor_clientes
+from app.api import api
 from app.nucleo.config import config
 from app.nucleo.db import obtener_sesion
 from app.nucleo.limitador import limitador
 from app.nucleo.manejo_errores import registrar_manejadores
-from app.nucleo.seguridad import usuario_actual
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("api")
@@ -45,9 +32,4 @@ def salud(sesion: Session = Depends(obtener_sesion)):
     return {"estado": "ok"}
 
 
-# Cada funcionalidad es una rebanada vertical: rutas (entrada HTTP), servicio (lógica y consultas),
-# esquemas (contrato) y tests. Las rutas reciben su servicio por inyección de dependencias.
-app.include_router(autenticacion.router, prefix="/api/v1")  # público: emite el token
-for rebanada in (calidad, compras, envios, estacionalidad, estados, hipotesis,
-                 promociones, resumen, satisfaccion, suscripcion, tallas, valor_clientes):
-    app.include_router(rebanada.router, prefix="/api/v1", dependencies=[Depends(usuario_actual)])
+app.include_router(api)

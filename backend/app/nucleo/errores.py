@@ -6,7 +6,7 @@ Los servicios los lanzan y deciden el estado y el mensaje; no conocen HTTP. Un √
 
 
 class ErrorAplicacion(Exception):
-    estado: int = 500
+    estatus: int = 500
     codigo: str = "error_interno"
 
     def __init__(self, mensaje: str, *, detalle: list[dict] | None = None,
@@ -18,25 +18,25 @@ class ErrorAplicacion(Exception):
 
 
 class CredencialesInvalidas(ErrorAplicacion):
-    estado, codigo = 401, "credenciales_invalidas"
+    estatus, codigo = 401, "credenciales_invalidas"
 
     def __init__(self):
         super().__init__("Usuario o clave incorrectos", cabeceras={"WWW-Authenticate": "Bearer"})
 
 
 class TokenInvalido(ErrorAplicacion):
-    estado, codigo = 401, "token_invalido"
+    estatus, codigo = 401, "token_invalido"
 
     def __init__(self, mensaje: str = "Token inv√°lido o vencido"):
         super().__init__(mensaje, cabeceras={"WWW-Authenticate": "Bearer"})
 
 
 class DatosInsuficientes(ErrorAplicacion):
-    estado, codigo = 422, "datos_insuficientes"
+    estatus, codigo = 422, "datos_insuficientes"
 
 
 class LimiteExcedido(ErrorAplicacion):
-    estado, codigo = 429, "limite_excedido"
+    estatus, codigo = 429, "limite_excedido"
 
     def __init__(self, espera_seg: int):
         super().__init__(f"Demasiados intentos. Intenta de nuevo en {espera_seg} segundos.",
@@ -44,7 +44,7 @@ class LimiteExcedido(ErrorAplicacion):
 
 
 class ServicioNoDisponible(ErrorAplicacion):
-    estado, codigo = 503, "servicio_no_disponible"
+    estatus, codigo = 503, "servicio_no_disponible"
 
     def __init__(self):
         super().__init__("Base de datos no disponible")

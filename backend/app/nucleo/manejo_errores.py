@@ -18,7 +18,7 @@ MENSAJES_HTTP = {404: "La ruta solicitada no existe", 405: "Método no permitido
 
 
 def _desde_aplicacion(error: ErrorAplicacion):
-    return respuesta_error(error.estado, error.codigo, error.mensaje,
+    return respuesta_error(error.estatus, error.codigo, error.mensaje,
                            detalle=error.detalle, cabeceras=error.cabeceras)
 
 
