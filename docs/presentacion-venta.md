@@ -62,12 +62,12 @@ y separa lo que sí se puede concluir de lo que no.
 - Los resultados de este ejemplo salen de un dataset público de compras de moda. **Con los datos reales de
   la tienda, las cifras cambian y el sistema se calibra con ellos.**
 
-## Siguiente paso propuesto: piloto de cuatro semanas
+## Siguiente paso propuesto: un piloto con las compras de la tienda
 
-1. **Semana 1:** conectar el historial de compras de la tienda con fechas y costos.
-2. **Semana 2:** correr el análisis y validar la calidad de los datos con el equipo.
-3. **Semana 3:** convertir las preguntas más urgentes en decisiones de promoción e inventario.
-4. **Semana 4:** medir el resultado de las decisiones frente a la línea base.
+1. Conectar el historial de compras de la tienda, con fechas y costos.
+2. Validar la calidad de los datos con el equipo.
+3. Convertir las preguntas más urgentes en decisiones de promoción e inventario.
+4. Medir los resultados de esas decisiones frente a una línea base.
 
 ---
 

@@ -140,18 +140,5 @@ El dataset no tiene fechas ni datos antes y después de una promoción. Decirlo 
 
 ---
 
-## 9 · MOSTRAR: el siguiente paso
-
-```
-  Semana 1 ─── conectar compras con fecha y costo
-  Semana 2 ─── validar calidad de datos con el equipo
-  Semana 3 ─── convertir preguntas en decisiones
-  Semana 4 ─── medir resultados contra la línea base
-```
-
-Un piloto de cuatro semanas con las compras reales de la tienda.
-
----
-
 *Inspiración: Dan Roam, The Back of the Napkin (2008). Las cifras provienen del dataset público
 Customer Shopping Trends de Kaggle; los bocetos son ilustrativos.*
