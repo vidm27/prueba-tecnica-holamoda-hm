@@ -1,4 +1,4 @@
-import logging
+from loguru import logger as log
 import os
 import sys
 
@@ -7,9 +7,6 @@ from sqlalchemy import create_engine
 from cargar import cargar
 from extraer import extraer
 from transformar import transformar
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
-log = logging.getLogger("etl")
 
 
 def main() -> int:
