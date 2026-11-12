@@ -1,15 +1,18 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import Connection
+from sqlmodel import Session
 
 from app.funcionalidades.calidad.esquemas import Hallazgo
-from app.nucleo.db import filas, obtener_conexion
+from app.funcionalidades.calidad.servicio import CalidadServicio
+from app.nucleo.db import obtener_sesion
 
 router = APIRouter(tags=["Calidad de datos"])
 
 
+def obtener_servicio(sesion: Session = Depends(obtener_sesion)) -> CalidadServicio:
+    return CalidadServicio(sesion)
+
+
 @router.get("/calidad/auditoria", response_model=list[Hallazgo],
             summary="Hallazgos de calidad detectados por el ETL")
-def auditoria(con: Connection = Depends(obtener_conexion)):
-    return filas(con, """
-        SELECT regla, descripcion, severidad, filas_afectadas, total_filas, evidencia
-        FROM auditoria ORDER BY CASE severidad WHEN 'alta' THEN 0 WHEN 'media' THEN 1 ELSE 2 END, id""")
+def auditoria(servicio: CalidadServicio = Depends(obtener_servicio)):
+    return servicio.hallazgos()

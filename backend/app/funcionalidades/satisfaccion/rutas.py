@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import Connection
+from sqlmodel import Session
 
 from app.funcionalidades.satisfaccion.esquemas import Satisfaccion
-from app.nucleo.db import filas, obtener_conexion
+from app.funcionalidades.satisfaccion.servicio import SatisfaccionServicio
+from app.nucleo.db import obtener_sesion
 
 router = APIRouter(tags=["Satisfacción"])
 
 
+def obtener_servicio(sesion: Session = Depends(obtener_sesion)) -> SatisfaccionServicio:
+    return SatisfaccionServicio(sesion)
+
+
 @router.get("/productos/satisfaccion", response_model=list[Satisfaccion],
             summary="Productos ordenados por calificación (peor primero)")
-def satisfaccion(con: Connection = Depends(obtener_conexion)):
-    return filas(con, """
-        SELECT p.nombre AS producto, p.categoria, count(*) AS compras,
-               round(avg(c.calificacion)::numeric, 2) AS calificacion,
-               round((1.96 * stddev_samp(c.calificacion) / sqrt(count(*)))::numeric, 2) AS margen_error_95
-        FROM compras c JOIN productos p ON p.id = c.producto_id
-        GROUP BY p.nombre, p.categoria ORDER BY calificacion, compras DESC""")
+def satisfaccion(servicio: SatisfaccionServicio = Depends(obtener_servicio)):
+    return servicio.por_producto()

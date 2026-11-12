@@ -1,7 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class Hallazgo(BaseModel):
+    model_config = ConfigDict(from_attributes=True)  # se construye desde el modelo ORM
+
     regla: str
     descripcion: str
     severidad: str
