@@ -26,8 +26,8 @@ class PromocionesServicio:
     def __init__(self, sesion: Session):
         self._sesion = sesion
 
-    def obtener(self) -> dict:
-        productos = filas(self._sesion, compras_con_detalle(
+    def obtener(self, genero: str | None = None) -> dict:
+        consulta = compras_con_detalle(
             Producto.nombre.label("producto"),
             Producto.categoria,
             func.count(Compra.id).label("ventas"),
@@ -36,8 +36,14 @@ class PromocionesServicio:
             func.avg(case((Cliente.genero == "Female", 1), else_=0)).label("pct_mujeres"),
             func.avg(Compra.monto_usd).filter(Compra.descuento).label("ticket_con_descuento"),
             func.avg(Compra.monto_usd).filter(not_(Compra.descuento)).label("ticket_sin_descuento"),
-        ).group_by(Producto.nombre, Producto.categoria)
-          .order_by(func.count(Compra.id), desc(func.avg(Compra.calificacion))))
+        )
+        if genero in ("Female", "Male"):
+            consulta = consulta.where(Cliente.genero == genero)
+        productos = filas(
+            self._sesion,
+            consulta.group_by(Producto.nombre, Producto.categoria)
+            .order_by(func.count(Compra.id), desc(func.avg(Compra.calificacion))),
+        )
 
         for p in productos:
             p["calificacion"] = redondear(p["calificacion"], 2)
