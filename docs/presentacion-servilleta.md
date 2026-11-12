@@ -84,7 +84,22 @@ Las seis preguntas del método, aplicadas a la tienda. El ¿POR QUÉ? queda fuer
 
 ---
 
-## 6 · MOSTRAR: qué promocionar
+## 6 · IMAGINAR: cómo está armado
+
+```
+  CSV ──► ETL ──► Base ──► API ──► Pantalla
+ (datos)  valida   Postgres  JWT     8 preguntas
+          audita              Swagger  (una vista c/u)
+```
+
+Cada pregunta del negocio es una carpeta completa: consulta, reglas y pruebas. Si una pregunta cambia,
+se toca solo su carpeta.
+
+> Nota: el dibujo muestra el flujo de los datos. Los detalles están en la documentación del proyecto.
+
+---
+
+## 7 · MOSTRAR: qué promocionar
 
 ```
  calificación
@@ -108,7 +123,7 @@ un producto que ya se vende no suma nada.
 
 ---
 
-## 7 · MOSTRAR: cuánto de cada talla
+## 8 · MOSTRAR: cuánto de cada talla
 
 ```
   Talla   Participación
@@ -124,7 +139,7 @@ Pedir inventario por talla es pedir esta proporción, no un número igual para t
 
 ---
 
-## 8 · MOSTRAR: qué puedes concluir y qué no
+## 9 · MOSTRAR: qué puedes concluir y qué no
 
 ```
   SE PUEDE CONCLUIR          NO SE PUEDE CONCLUIR
