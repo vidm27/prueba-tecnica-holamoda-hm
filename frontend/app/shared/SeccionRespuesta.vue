@@ -7,7 +7,7 @@ defineProps<{ cargando?: boolean; error?: Error | null }>()
 </script>
 
 <template>
-  <UAlert v-if="error" color="error" variant="subtle" icon="i-lucide-circle-alert" title="No se pudieron cargar los datos" :description="error.message" />
+  <UAlert v-if="error" color="error" variant="subtle" icon="i-lucide-circle-alert" title="No se pudieron cargar los datos" :description="mensajeAmigable(error instanceof ErrorApi ? error.estado : 0, error.message)" />
   <div v-else-if="cargando" class="mx-auto max-w-6xl space-y-6">
     <div class="grid gap-4 sm:grid-cols-3">
       <USkeleton v-for="n in 3" :key="n" class="h-24" />
