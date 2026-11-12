@@ -4,6 +4,7 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import Connection, text
+from slowapi.errors import RateLimitExceeded
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.funcionalidades.autenticacion import rutas as autenticacion
@@ -21,6 +22,7 @@ from app.funcionalidades.tallas import rutas as tallas
 from app.funcionalidades.valor_clientes import rutas as valor_clientes
 from app.nucleo.config import config
 from app.nucleo.db import obtener_conexion
+from app.nucleo.limitador import limitador, respuesta_limite_excedido
 from app.nucleo.seguridad import usuario_actual
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -34,6 +36,10 @@ app = FastAPI(
 )
 app.add_middleware(CORSMiddleware, allow_origins=config.cors_origenes.split(","),
                    allow_methods=["GET", "POST"], allow_headers=["Authorization", "Content-Type"])
+
+
+app.state.limitador = limitador
+app.add_exception_handler(RateLimitExceeded, respuesta_limite_excedido)
 
 
 @app.exception_handler(SQLAlchemyError)
