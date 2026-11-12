@@ -8,12 +8,15 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.funcionalidades.autenticacion import rutas as autenticacion
 from app.funcionalidades.compras import rutas as compras
+from app.funcionalidades.envios import rutas as envios
 from app.funcionalidades.estacionalidad import rutas as estacionalidad
 from app.funcionalidades.estados import rutas as estados
 from app.funcionalidades.promociones import rutas as promociones
 from app.funcionalidades.resumen import rutas as resumen
 from app.funcionalidades.satisfaccion import rutas as satisfaccion
+from app.funcionalidades.suscripcion import rutas as suscripcion
 from app.funcionalidades.tallas import rutas as tallas
+from app.funcionalidades.valor_clientes import rutas as valor_clientes
 from app.nucleo.config import config
 from app.nucleo.db import obtener_conexion
 from app.nucleo.seguridad import usuario_actual
@@ -45,5 +48,5 @@ def salud(con: Connection = Depends(obtener_conexion)):
 
 # Cada funcionalidad es una rebanada vertical: ruta + esquemas + SQL + tests en su carpeta.
 app.include_router(autenticacion.router, prefix="/api/v1")  # público: emite el token
-for rebanada in (compras, estacionalidad, estados, promociones, resumen, satisfaccion, tallas):
+for rebanada in (compras, envios, estacionalidad, estados, promociones, resumen, satisfaccion, suscripcion, tallas, valor_clientes):
     app.include_router(rebanada.router, prefix="/api/v1", dependencies=[Depends(usuario_actual)])
