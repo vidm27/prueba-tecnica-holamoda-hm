@@ -1,0 +1,5 @@
+# Configuración de Ruff para todo el monorepo (backend/ y etl/).
+# Reglas por defecto de Ruff (errores de pyflakes y pycodestyle críticos), sin reformateo forzado.
+
+[tool.ruff]
+target-version = "py312"
