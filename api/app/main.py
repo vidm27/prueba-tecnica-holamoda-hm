@@ -7,8 +7,11 @@ from sqlalchemy import Connection, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.funcionalidades.autenticacion import rutas as autenticacion
+from app.funcionalidades.compras import rutas as compras
+from app.funcionalidades.resumen import rutas as resumen
 from app.nucleo.config import config
 from app.nucleo.db import obtener_conexion
+from app.nucleo.seguridad import usuario_actual
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("api")
@@ -37,3 +40,5 @@ def salud(con: Connection = Depends(obtener_conexion)):
 
 # Cada funcionalidad es una rebanada vertical: ruta + esquemas + SQL + tests en su carpeta.
 app.include_router(autenticacion.router, prefix="/api/v1")  # público: emite el token
+for rebanada in (compras, resumen):
+    app.include_router(rebanada.router, prefix="/api/v1", dependencies=[Depends(usuario_actual)])
