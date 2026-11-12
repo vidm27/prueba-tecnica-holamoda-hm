@@ -11,6 +11,15 @@ services:
       interval: 3s
       retries: 10
 
+  api:
+    build: ./api
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
   etl:
     build: ./etl
     env_file: .env
