@@ -3,14 +3,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.funcionalidades.autenticacion.esquemas import Token
 from app.funcionalidades.autenticacion.servicio import AutenticacionServicio, CredencialesInvalidas
+from app.funcionalidades.autenticacion.dependencias import obtener_servicio
 from app.nucleo.config import config
 from app.nucleo.limitador import limitador
 
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
-
-
-def obtener_servicio() -> AutenticacionServicio:
-    return AutenticacionServicio()
 
 
 @router.post("/login", response_model=Token, summary="Obtener un token JWT",

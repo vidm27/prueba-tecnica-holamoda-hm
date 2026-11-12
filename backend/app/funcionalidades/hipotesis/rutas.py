@@ -1,21 +1,16 @@
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session
 
 from app.funcionalidades.hipotesis.esquemas import ResultadoHipotesis
 from app.funcionalidades.hipotesis.servicio import DatosInsuficientes, HipotesisServicio
-from app.nucleo.db import obtener_sesion
+from app.funcionalidades.hipotesis.dependencias import obtener_servicio
 
 router = APIRouter(tags=["Hipótesis"])
 
 Metrica = Literal["monto_usd", "calificacion"]
 Variable = Literal["genero", "suscrito", "grupo_edad", "estado", "nivel_valor", "frecuencia", "categoria",
                    "producto", "talla", "color", "temporada", "tipo_envio", "metodo_pago", "descuento"]
-
-
-def obtener_servicio(sesion: Session = Depends(obtener_sesion)) -> HipotesisServicio:
-    return HipotesisServicio(sesion)
 
 
 @router.get("/hipotesis", response_model=ResultadoHipotesis,

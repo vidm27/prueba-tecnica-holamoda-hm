@@ -1,15 +1,10 @@
 from fastapi import APIRouter, Depends, Query
-from sqlmodel import Session
 
 from app.funcionalidades.compras.esquemas import PaginaCompras
 from app.funcionalidades.compras.servicio import ComprasServicio
-from app.nucleo.db import obtener_sesion
+from app.funcionalidades.compras.dependencias import obtener_servicio
 
 router = APIRouter(tags=["Compras"])
-
-
-def obtener_servicio(sesion: Session = Depends(obtener_sesion)) -> ComprasServicio:
-    return ComprasServicio(sesion)
 
 
 @router.get("/compras", response_model=PaginaCompras, summary="Listado paginado de compras con filtros")

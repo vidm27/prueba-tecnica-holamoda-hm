@@ -5,7 +5,7 @@ def test_resumen(cliente, auth):
 
 def test_la_dependencia_del_servicio_es_sustituible(cliente, auth):
     """Prueba la inyección de dependencias: la ruta usa el servicio que FastAPI le entrega."""
-    from app.funcionalidades.resumen.rutas import obtener_servicio
+    from app.funcionalidades.resumen.dependencias import obtener_servicio
     from app.main import app
 
     class ServicioFalso:
