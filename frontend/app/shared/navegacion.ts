@@ -3,9 +3,22 @@ export type Audiencia = 'Marketing' | 'Ventas' | 'Finanzas'
 export const AUDIENCIAS: Audiencia[] = ['Marketing', 'Ventas', 'Finanzas']
 
 /** `para`: a quién le sirve la respuesta; vacío = a todos. */
-export interface Seccion { slug: string; menu: string; pregunta: string; icono: string; para: Audiencia[] }
+export interface Seccion {
+  slug: string
+  menu: string
+  pregunta: string
+  icono: string
+  para: Audiencia[]
+  oculto?: boolean
+}
 
-export const GRUPOS: { titulo: string; secciones: Seccion[] }[] = [
+export interface GrupoNavegacion {
+  titulo: string
+  oculto?: boolean
+  secciones: Seccion[]
+}
+
+export const GRUPOS: GrupoNavegacion[] = [
   {
     titulo: 'Productos',
     secciones: [
@@ -36,9 +49,10 @@ export const GRUPOS: { titulo: string; secciones: Seccion[] }[] = [
   },
   {
     titulo: 'Confianza',
+    oculto: true,
     secciones: [
-      { slug: 'calidad', menu: 'Calidad de datos', pregunta: 'Auditoría estructural y estadística del conjunto de datos', icono: 'i-lucide-shield-check', para: [] },
-      { slug: 'hipotesis', menu: 'Prueba de hipótesis', pregunta: 'Laboratorio estadístico con corrección por comparaciones múltiples', icono: 'i-lucide-flask-conical', para: [] },
+      { slug: 'calidad', menu: 'Calidad de datos', pregunta: 'Auditoría estructural y estadística del conjunto de datos', icono: 'i-lucide-shield-check', para: [], oculto: true },
+      { slug: 'hipotesis', menu: 'Prueba de hipótesis', pregunta: 'Laboratorio estadístico con corrección por comparaciones múltiples', icono: 'i-lucide-flask-conical', para: [], oculto: true },
     ],
   },
 ]
@@ -46,6 +60,6 @@ export const GRUPOS: { titulo: string; secciones: Seccion[] }[] = [
 export const SECCIONES = GRUPOS.flatMap((g) => g.secciones)
 export const buscarSeccion = (slug: string) => SECCIONES.find((s) => s.slug === slug)
 
-/** Preguntas para un rol; sin rol, todas. Las de "Confianza" (para todos) siempre aparecen. */
+/** Preguntas visibles para un rol; sin rol, todas las visibles (excluye las ocultas como Confianza). */
 export const seccionesPara = (rol?: Audiencia) =>
-  SECCIONES.filter((s) => !rol || s.para.length === 0 || s.para.includes(rol))
+  SECCIONES.filter((s) => !s.oculto && (!rol || s.para.length === 0 || s.para.includes(rol)))
