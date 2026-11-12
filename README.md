@@ -94,6 +94,17 @@ docker compose run --rm --no-deps etl pytest -q
 cd frontend && pnpm install && pnpm test
 ```
 
+## Calidad y CI
+
+GitHub Actions (`.github/workflows/ci.yml`) corre en cada push a `main` y en cada pull request.
+
+| Job | Qué valida | Cómo correrlo local |
+|---|---|---|
+| Lint (Ruff) | Errores de Python en `backend/` y `etl/`. Configuración en `pyproject.toml` | `ruff check backend etl` (Ruff 0.9.3) |
+| Tests ETL | Transformaciones y auditoría del dataset | `docker compose run --rm --no-deps etl pytest -q` |
+| Tests backend | Endpoints contra Postgres, con los datos que carga el ETL | `docker compose run --rm --no-deps api pytest -q` |
+| Frontend | Lint y tests del frontend, si existen los scripts | `cd frontend && pnpm test` |
+
 ## Desarrollo local (sin Docker para backend y frontend)
 
 ```bash
@@ -121,6 +132,12 @@ docker compose down -v            # parar y borrar la base
 - `NUXT_PUBLIC_API_BASE` se incorpora al **compilar** el frontend, porque lo usa el navegador. Si cambia, ejecuta `docker compose build frontend`.
 - CORS acepta los orígenes de `CORS_ORIGENES`.
 - El login tiene límite de intentos por IP (`LOGIN_LIMITE`, por defecto 5 cada 5 minutos). Al superarlo responde 429 con `Retry-After`.
+
+## Límites conocidos
+
+- **Frontend sin ESLint:** el paso de lint del frontend en CI no valida nada hasta que se agregue la configuración.
+- **E2E fuera de CI:** Playwright (`frontend/tests/e2e`) necesita backend y frontend levantados. Se corre a mano con `pnpm test:e2e`.
+- **Sin medición formal de rendimiento:** no hay pruebas de carga ni tiempos de respuesta documentados.
 
 ## Fuente de datos
 
